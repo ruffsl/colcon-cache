@@ -1,0 +1,31 @@
+name: Python CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+    - name: Install pip dependencies
+      run: |
+        pip install -r **/requirements.txt
+        pip install git+https://github.com/colcon/colcon-core
+    - name: Test with pytest
+      run: |
+        pytest --cov=colcon_snapshot --cov-branch
