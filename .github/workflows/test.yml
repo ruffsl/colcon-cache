@@ -23,5 +23,6 @@ jobs:
       run: |
         pytest --cov=colcon_snapshot --cov-branch
     - uses: codecov/codecov-action@v1
+      if: matrix.python-version == '3.8'
       with:
         env_vars: OS,PYTHON
