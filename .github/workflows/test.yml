@@ -25,7 +25,6 @@ jobs:
     - name: Install pip dependencies
       run: |
         pip install -r **/requirements.txt
-        pip install git+https://github.com/colcon/colcon-core
     - name: Test with pytest
       run: |
         pytest --cov=colcon_snapshot --cov-branch
