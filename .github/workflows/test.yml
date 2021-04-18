@@ -23,3 +23,5 @@ jobs:
       run: |
         pytest --cov=colcon_snapshot --cov-branch
     - uses: codecov/codecov-action@v1
+      with:
+        env_vars: OS,PYTHON
