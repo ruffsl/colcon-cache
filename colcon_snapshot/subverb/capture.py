@@ -1,46 +1,34 @@
 # Copyright 2016-2018 Dirk Thomas
+# Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+from colcon_core.package_selection import add_arguments \
+    as add_packages_arguments
+from colcon_core.package_selection import get_package_descriptors
 from colcon_core.plugin_system import satisfies_version
-from colcon_metadata.metadata.repository import get_repositories
-from colcon_metadata.metadata.repository import get_repository_metadata_files
-from colcon_metadata.subverb import MetadataSubverbExtensionPoint
+from colcon_snapshot.subverb import SnapshotSubverbExtensionPoint
 
 
-class ListMetadataSubverb(MetadataSubverbExtensionPoint):
-    """List all repositories and their metadata."""
+class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
+    """Capture current snapshot for packages."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
         satisfies_version(
-            MetadataSubverbExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
+            SnapshotSubverbExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
 
     def add_arguments(self, *, parser):  # noqa: D102
-        argument = parser.add_argument(
-            'name',
-            nargs='?',
-            help='Only list the information for a specific repository')
-        try:
-            from argcomplete.completers import ChoicesCompleter
-        except ImportError:
-            pass
-        else:
-            repos = get_repositories()
-            argument.completer = \
-                ChoicesCompleter(repos.keys())
+        # only added so that package selection arguments can be used
+        # which use the build directory to store state information
+        parser.add_argument(
+            '--build-base',
+            default='build',
+            help='The base path for all build directories (default: build)')
+
+        add_packages_arguments(parser)
 
     def main(self, *, context):  # noqa: D102
-        repos = get_repositories()
-        if context.args.name and context.args.name not in repos.keys():
-            return "Passed repository name '{context.args.name}' is unknown" \
-                .format_map(locals())
+        args = context.args
 
-        for name in sorted(repos.keys()):
-            if context.args.name and context.args.name != name:
-                continue
-            url = repos[name]
-            print('{name}: {url}'.format_map(locals()))
-            metadata_files = get_repository_metadata_files(
-                repository_name=name)
-            for path in sorted(metadata_files):
-                print('- {path}'.format_map(locals()))
+        # descriptors = get_package_descriptors(args)
+        _ = get_package_descriptors(args)

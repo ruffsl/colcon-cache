@@ -5,6 +5,10 @@ noqa
 pathlib
 plugin
 pytest
+rtype
 scspell
 setuptools
+subparser
+subparsers
+subverb
 thomas
