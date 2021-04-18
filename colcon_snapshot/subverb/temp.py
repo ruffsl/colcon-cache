@@ -1,0 +1,207 @@
+# Copyright 2016-2018 Dirk Thomas
+# Copyright 2021 Ruffin White
+# Licensed under the Apache License, Version 2.0
+
+from collections import OrderedDict
+import os
+import os.path
+from pathlib import Path
+# import traceback
+
+from colcon_core.argument_parser.destination_collector \
+    import DestinationCollectorDecorator
+from colcon_core.event.job import JobUnselected
+from colcon_core.event_handler import add_event_handler_arguments
+from colcon_core.executor import add_executor_arguments
+from colcon_core.executor import execute_jobs
+from colcon_core.executor import Job
+from colcon_core.executor import OnError
+from colcon_core.package_identification.ignore import IGNORE_MARKER
+from colcon_core.package_selection import add_arguments \
+    as add_packages_arguments
+from colcon_core.package_selection import get_packages
+from colcon_core.plugin_system import satisfies_version
+# from colcon_core.shell import get_shell_extensions
+from colcon_core.task import add_task_arguments
+from colcon_core.task import get_task_extension
+from colcon_core.task import TaskContext
+from colcon_core.verb import check_and_mark_build_tool
+from colcon_core.verb import check_and_mark_install_layout
+from colcon_core.verb import logger
+from colcon_core.verb import update_object
+from colcon_core.verb import VerbExtensionPoint
+
+
+class StagePackageArguments:
+    """Arguments to stage a specific package."""
+
+    def __init__(self, pkg, args, *, additional_destinations=None):
+        """
+        Construct a StagePackageArguments.
+
+        :param pkg: The package descriptor
+        :param args: The parsed command line arguments
+        :param list additional_destinations: The destinations of additional
+          arguments
+        """
+        super().__init__()
+        self.path = os.path.abspath(
+            os.path.join(os.getcwd(), str(pkg.path)))
+        self.build_base = os.path.abspath(os.path.join(
+            os.getcwd(), args.build_base, pkg.name))
+        self.install_base = os.path.abspath(os.path.join(
+            os.getcwd(), args.install_base))
+        if not args.merge_install:
+            self.install_base = os.path.join(
+                self.install_base, pkg.name)
+        self.test_result_base = os.path.abspath(os.path.join(
+            os.getcwd(), args.test_result_base, pkg.name)) \
+            if args.test_result_base else None
+        self.tare_changes = args.tare_changes
+
+        # set additional arguments
+        for dest in (additional_destinations or []):
+            # from the command line
+            if hasattr(args, dest):
+                update_object(
+                    self, dest, getattr(args, dest),
+                    pkg.name, 'stage', 'command line')
+            # from the package metadata
+            if dest in pkg.metadata:
+                update_object(
+                    self, dest, pkg.metadata[dest],
+                    pkg.name, 'stage', 'package metadata')
+
+
+class StageVerb(VerbExtensionPoint):
+    """Stage a set of packages."""
+
+    def __init__(self):  # noqa: D107
+        super().__init__()
+        satisfies_version(VerbExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
+
+    def add_arguments(self, *, parser):  # noqa: D102
+        parser.add_argument(
+            '--build-base',
+            default='build',
+            help='The base path for all build directories (default: build)')
+        parser.add_argument(
+            '--install-base',
+            default='install',
+            help='The base path for all install prefixes (default: install)')
+        parser.add_argument(
+            '--merge-install',
+            action='store_true',
+            help='Merge all install prefixes into a single location')
+        parser.add_argument(
+            '--test-result-base',
+            help='The base path for all test results (default: --build-base)')
+        parser.add_argument(
+            '--tare-changes',
+            action='store_true',
+            help='Tare changes by resets reference checksums for staging')
+        add_executor_arguments(parser)
+        add_event_handler_arguments(parser)
+
+        add_packages_arguments(parser)
+
+        decorated_parser = DestinationCollectorDecorator(parser)
+        add_task_arguments(decorated_parser, 'colcon_core.task.build')
+        self.task_argument_destinations = decorated_parser.get_destinations()
+
+    def main(self, *, context):  # noqa: D102
+        check_and_mark_build_tool(context.args.build_base)
+        check_and_mark_install_layout(
+            context.args.install_base,
+            merge_install=context.args.merge_install)
+
+        self._create_paths(context.args)
+
+        decorators = get_packages(
+            context.args,
+            additional_argument_names=self.task_argument_destinations,
+            recursive_categories=('run', ))
+
+        install_base = os.path.abspath(os.path.join(
+            os.getcwd(), context.args.install_base))
+        jobs, unselected_packages = self._get_jobs(
+            context.args, decorators, install_base)
+
+        # TODO: OnError.continue_ is a workaround given rc need not be 0
+        # on_error = OnError.interrupt \
+        #     if not context.args.continue_on_error else OnError.skip_downstream
+        on_error = OnError.continue_
+
+        def post_unselected_packages(*, event_queue):
+            nonlocal unselected_packages
+            names = [pkg.name for pkg in unselected_packages]
+            for name in sorted(names):
+                event_queue.put(
+                    (JobUnselected(name), None))
+
+        rc = execute_jobs(
+            context, jobs, on_error=on_error,
+            pre_execution_callback=post_unselected_packages)
+
+        return rc
+
+    def _create_paths(self, args):
+        self._create_path(args.build_base)
+        self._create_path(args.install_base)
+
+    def _create_path(self, path):
+        path = Path(os.path.abspath(path))
+        if not path.exists():
+            path.mkdir(parents=True, exist_ok=True)
+        ignore_marker = path / IGNORE_MARKER
+        if not os.path.lexists(str(ignore_marker)):
+            with ignore_marker.open('w'):
+                pass
+
+    def _get_jobs(self, args, decorators, install_base):
+        jobs = OrderedDict()
+        unselected_packages = set()
+        for decorator in decorators:
+            pkg = decorator.descriptor
+
+            if not decorator.selected:
+                unselected_packages.add(pkg)
+                continue
+
+            # TODO: workaround by hard coding pkg.type to default for entry point
+            # extension = get_task_extension('colcon_core.task.stage', pkg.type)
+            extension = get_task_extension('colcon_core.task.stage', 'default')
+            if not extension:
+                logger.warning(
+                    "No task extension to 'stage' a '{pkg.type}' package"
+                    .format_map(locals()))
+                continue
+
+            recursive_dependencies = OrderedDict()
+            for dep_name in decorator.recursive_dependencies:
+                dep_path = install_base
+                if not args.merge_install:
+                    dep_path = os.path.join(dep_path, dep_name)
+                recursive_dependencies[dep_name] = dep_path
+
+            package_args = StagePackageArguments(
+                pkg, args, additional_destinations=self
+                .task_argument_destinations.values())
+            ordered_package_args = ', '.join([
+                ('%s: %s' % (repr(k), repr(package_args.__dict__[k])))
+                for k in sorted(package_args.__dict__.keys())
+            ])
+            logger.debug(
+                "Staging package '{pkg.name}' with the following arguments: "
+                '{{{ordered_package_args}}}'.format_map(locals()))
+            task_context = TaskContext(
+                pkg=pkg, args=package_args,
+                dependencies=recursive_dependencies)
+
+            job = Job(
+                identifier=pkg.name,
+                dependencies=set(recursive_dependencies.keys()),
+                task=extension, task_context=task_context)
+
+            jobs[pkg.name] = job
+        return jobs, unselected_packages
