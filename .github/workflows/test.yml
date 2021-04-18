@@ -24,7 +24,7 @@ jobs:
         restore-keys: ${{ runner.os }}-pip-
     - name: Install pip dependencies
       run: |
-        pip install -r **/requirements.txt
+        find -name "requirements.txt" -type f -exec pip install -r '{}' ';'
     - name: Test with pytest
       run: |
         pytest --cov=colcon_snapshot --cov-branch
