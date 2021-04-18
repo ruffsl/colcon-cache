@@ -1,17 +1,11 @@
 name: Test Workflow
-
-on:
-  pull_request:
-  push:
-
+on: [pull_request, push]
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.5, 3.6, 3.7, 3.8]
-
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
@@ -28,3 +22,4 @@ jobs:
     - name: Run tests
       run: |
         pytest --cov=colcon_snapshot --cov-branch
+    - uses: codecov/codecov-action@v1
