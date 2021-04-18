@@ -1,4 +1,5 @@
 # Copyright 2016-2018 Dirk Thomas
+# Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
 from colcon_core.logging import colcon_logger
@@ -8,23 +9,23 @@ from colcon_core.plugin_system import order_extensions_by_name
 logger = colcon_logger.getChild(__name__)
 
 
-class MetadataSubverbExtensionPoint:
+class SnapshotSubverbExtensionPoint:
     """
-    The interface for metadata subverb extensions.
+    The interface for snapshot subverb extensions.
 
-    A metadata subverb extension provides a subverb to the `metadata` verb of
+    A snapshot subverb extension provides a subverb to the `snapshot` verb of
     the command line tool.
 
     For each instance the attribute `SUBVERB_NAME` is being set to the basename
     of the entry point registering the extension.
     """
 
-    """The version of the metadata subverb extension interface."""
+    """The version of the snapshot subverb extension interface."""
     EXTENSION_POINT_VERSION = '1.0'
 
     def add_arguments(self, *, parser):
         """
-        Add command line arguments specific to the metadata subverb.
+        Add command line arguments specific to the snapshot subverb.
 
         The method is intended to be overridden in a subclass.
 
@@ -34,7 +35,7 @@ class MetadataSubverbExtensionPoint:
 
     def main(self, *, context):
         """
-        Execute the metadata subverb extension logic.
+        Execute the snapshot subverb extension logic.
 
         This method must be overridden in a subclass.
 

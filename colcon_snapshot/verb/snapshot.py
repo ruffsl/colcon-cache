@@ -1,14 +1,15 @@
 # Copyright 2016-2018 Dirk Thomas
+# Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
 from colcon_core.command import add_subparsers
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.verb import VerbExtensionPoint
-from colcon_metadata.subverb import get_subverb_extensions
+from colcon_snapshot.subverb import get_subverb_extensions
 
 
-class MetadataVerb(VerbExtensionPoint):
-    """Manage metadata of packages."""
+class SnapshotVerb(VerbExtensionPoint):
+    """Manage snapshots of packages."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -22,7 +23,7 @@ class MetadataVerb(VerbExtensionPoint):
         # get subverb extensions and let them add their arguments
         subverb_extensions = get_subverb_extensions()
         add_subparsers(
-            parser, 'colcon metadata', subverb_extensions,
+            parser, 'colcon snapshot', subverb_extensions,
             attribute='subverb_name')
 
     def main(self, *, context):  # noqa: D102
