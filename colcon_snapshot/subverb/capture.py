@@ -161,7 +161,7 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
 
             job = Job(
                 identifier=pkg.name,
-                dependencies=None),
+                dependencies=[],
                 task=extension, task_context=task_context)
 
             jobs[pkg.name] = job

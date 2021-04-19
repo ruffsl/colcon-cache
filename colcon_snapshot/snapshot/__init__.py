@@ -2,26 +2,31 @@
 # Licensed under the Apache License, Version 2.0
 
 import yaml
-from collections import defaultdict
 
-class SnapshotArchive:
+class SnapshotLockfile:
     """Capture current snapshot for packages."""
 
     def __init__(self, path):  # noqa: D107
         if path.exists():
-            archive = path.read_text()
-            archive = yaml.load(archive)['archive']
+            lockdata = path.read_text()
+            lockdata = yaml.safe_load(lockdata)
         else:
-            archive = defaultdict(lambda: defaultdict(lambda: None))
+            lockdata = {'entry': {}}
 
-        self._archive = defaultdict(lambda: defaultdict(lambda: None), archive)
+        self._lockdata = lockdata
         self._path = path
 
     def get_entry(self, entry_type):  # noqa: D102
-        retrun self._archive['entry'][entry_type]
+        if entry_type in self._lockdata['entry']:
+            return self._lockdata['entry'][entry_type]
+        else:
+            return {'current_checksum': None,
+                    'reference_checksum': None}
 
     def set_entry(self, entry_type, entry_data):  # noqa: D102
-        self._archive['entry'][entry_type] = entry_data
+        self._lockdata['entry'][entry_type] = entry_data
 
-    def dump(self, path=self._path):  # noqa: D102
-        yaml.dump(self._archive, sort_keys=True)
+    def dump(self, path=None):  # noqa: D102
+        if path is None:
+            path = self._path
+        path.write_text(yaml.dump(self._lockdata, sort_keys=True))

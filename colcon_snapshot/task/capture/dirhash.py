@@ -9,7 +9,7 @@ from pathlib import Path
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
-from colcon_snapshot.snapshot import SnapshotArchive
+from colcon_snapshot.snapshot import SnapshotLockfile
 from dirhash import dirhash
 
 logger = colcon_logger.getChild(__name__)
@@ -31,23 +31,20 @@ class DirhashCaptureTask(TaskExtensionPoint):
             "Capturing dirhash snapshot of package in '{args.path}'"
             .format_map(locals()))
 
-        stage_base = Path(args.build_base, 'stage')
-        stage_base.mkdir(parents=True, exist_ok=True)
-        capture_snapshot_path = Path(stage_base, 'colcon_snapshot_capture.yaml')
-        capture_snapshot = SnapshotArchive(capture_snapshot_path)
+        snapshot_base = Path(args.build_base, 'snapshot')
+        snapshot_base.mkdir(parents=True, exist_ok=True)
+        capture_snapshot_path = Path(snapshot_base, 'colcon_snapshot_capture.yaml')
+        capture_snapshot = SnapshotLockfile(capture_snapshot_path)
 
         entry_data = capture_snapshot.get_entry(ENTRY_TYPE)
         entry_data['reference_checksum'] = entry_data['current_checksum']
-        entry_data['current_checksum'] = compute_current_checksum(args)
+        entry_data['current_checksum'] = self.compute_current_checksum(args)
         capture_snapshot.set_entry(ENTRY_TYPE, entry_data)
 
         capture_snapshot.dump()
-
-        # if not entry_data['reference_checksum'] == entry_data['current_checksum']:
-        #     return 'changed'
         return 0
 
-    def compute_current_checksum(args):
+    def compute_current_checksum(self, args):
         # Use the number of CPU cores
         jobs = os.cpu_count()
         with suppress(AttributeError):
