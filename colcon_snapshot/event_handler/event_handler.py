@@ -1,4 +1,5 @@
 # Copyright 2019 Dirk Thomas
+# Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
 from colcon_core.event.job import JobEnded
@@ -7,15 +8,15 @@ from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.verb.build import BuildPackageArguments
 from colcon_core.verb.test import TestPackageArguments
-from colcon_package_selection.package_selection.previous \
-    import set_result
-from colcon_package_selection.package_selection.previous \
-    import TEST_FAILURE_RESULT
+from colcon_snapshot.event_handler \
+    import get_previous_lockfile, set_lockfile
+from colcon_snapshot.subverb.capture \
+    import CaptureSnapshotPackageArguments
 
 
-class StoreResultEventHandler(EventHandlerExtensionPoint):
+class StoreLockfileEventHandler(EventHandlerExtensionPoint):
     """
-    Persist the result of a job in a file in its build directory.
+    Persist the lockfile of a job in a file in its build directory.
 
     The extension handles events of the following types:
     - :py:class:`colcon_core.event.job.JobEnded`
@@ -38,16 +39,30 @@ class StoreResultEventHandler(EventHandlerExtensionPoint):
         elif isinstance(data, JobEnded):
             job = event[1]
 
-            if isinstance(job.task_context.args, BuildPackageArguments):
+            if isinstance(job.task_context.args,
+                          CaptureSnapshotPackageArguments):
+                verb_name = 'snapshot'
+                lockfile = data.rc
+            elif isinstance(job.task_context.args,
+                            BuildPackageArguments):
                 verb_name = 'build'
-            elif isinstance(job.task_context.args, TestPackageArguments):
+                lockfile = get_previous_lockfile(
+                    job.task_context.args.build_base,
+                    'snapshot')
+            elif isinstance(job.task_context.args,
+                            TestPackageArguments):
                 verb_name = 'test'
+                lockfile = get_previous_lockfile(
+                    job.task_context.args.build_base,
+                    'build')
             else:
                 return
 
             if job in self._test_failures:
-                result = TEST_FAILURE_RESULT
-            else:
-                result = data.rc
+                return
+            if data.rc != '0':
+                if verb_name != 'snapshot':
+                    return
 
-            set_result(job.task_context.args.build_base, verb_name, result)
+            set_lockfile(
+                job.task_context.args.build_base, verb_name, lockfile)
