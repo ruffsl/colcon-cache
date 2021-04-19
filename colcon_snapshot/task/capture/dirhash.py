@@ -16,6 +16,7 @@ logger = colcon_logger.getChild(__name__)
 
 ENTRY_TYPE = 'dirhash'
 
+
 class DirhashCaptureTask(TaskExtensionPoint):
     """Capture snapshots of packages via dirhash."""
 
@@ -33,7 +34,8 @@ class DirhashCaptureTask(TaskExtensionPoint):
 
         snapshot_base = Path(args.build_base, 'snapshot')
         snapshot_base.mkdir(parents=True, exist_ok=True)
-        capture_snapshot_path = Path(snapshot_base, 'colcon_snapshot_capture.yaml')
+        capture_snapshot_path = Path(
+            snapshot_base, 'colcon_snapshot_capture.yaml')
         capture_snapshot = SnapshotLockfile(capture_snapshot_path)
 
         entry_data = capture_snapshot.get_entry(ENTRY_TYPE)

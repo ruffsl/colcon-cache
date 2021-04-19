@@ -98,7 +98,8 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
 
         # TODO: OnError.continue_ is a workaround given rc need not be 0
         # on_error = OnError.interrupt \
-        #     if not context.args.continue_on_error else OnError.skip_downstream
+        #     if not context.args.continue_on_error \
+        #     else OnError.skip_downstream
         on_error = OnError.continue_
 
         def post_unselected_packages(*, event_queue):
@@ -136,13 +137,17 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
                 unselected_packages.add(pkg)
                 continue
 
-            # TODO: workaround by hard coding pkg.type to dirhash for entry point
-            # extension = get_task_extension('colcon_snapshot.task.capture', pkg.type)
-            # extension = get_task_extension('colcon_snapshot.task.capture', 'dirhash')
-            extension = get_task_extension('colcon_snapshot.task.capture', 'git')
+            # TODO: workaround by hard coding pkg.type for entry point
+            # extension = get_task_extension(
+            #     'colcon_snapshot.task.capture', pkg.type)
+            # extension = get_task_extension(
+            #     'colcon_snapshot.task.capture', 'dirhash')
+            extension = get_task_extension(
+                'colcon_snapshot.task.capture', 'git')
             if not extension:
                 logger.warning(
-                    "No task extension to 'snapshot capture' a '{pkg.type}' package"
+                    "No task extension to 'snapshot capture' "
+                    "a '{pkg.type}' package"
                     .format_map(locals()))
                 continue
 

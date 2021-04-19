@@ -2,8 +2,6 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
-from contextlib import suppress
-import os
 from pathlib import Path
 
 from colcon_core.logging import colcon_logger
@@ -15,6 +13,7 @@ from git import Repo
 logger = colcon_logger.getChild(__name__)
 
 ENTRY_TYPE = 'git'
+
 
 class GitCaptureTask(TaskExtensionPoint):
     """Capture snapshots of packages via git."""
@@ -33,7 +32,8 @@ class GitCaptureTask(TaskExtensionPoint):
 
         snapshot_base = Path(args.build_base, 'snapshot')
         snapshot_base.mkdir(parents=True, exist_ok=True)
-        capture_snapshot_path = Path(snapshot_base, 'colcon_snapshot_capture.yaml')
+        capture_snapshot_path = Path(
+            snapshot_base, 'colcon_snapshot_capture.yaml')
         capture_snapshot = SnapshotLockfile(capture_snapshot_path)
 
         entry_data = capture_snapshot.get_entry(ENTRY_TYPE)
@@ -52,6 +52,6 @@ class GitCaptureTask(TaskExtensionPoint):
         return self.latest_commit_sha(repo, args.path)
 
     def latest_commit_sha(self, repo, path):  # noqa: D102
-        log_message = repo.git.log("-1", path)
+        log_message = repo.git.log('-1', path)
         commit_sha = log_message.split('\n')[0].split(' ')[1]
         return commit_sha

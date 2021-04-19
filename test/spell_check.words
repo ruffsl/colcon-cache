@@ -1,6 +1,12 @@
 apache
+checksum
 colcon
+contextlib
+dirhash
+getaffinity
 iterdir
+lockdata
+lockfile
 noqa
 pathlib
 plugin
@@ -12,3 +18,6 @@ subparser
 subparsers
 subverb
 thomas
+todo
+workaround
+yaml

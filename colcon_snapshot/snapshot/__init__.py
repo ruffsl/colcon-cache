@@ -3,6 +3,7 @@
 
 import yaml
 
+
 class SnapshotLockfile:
     """Capture current snapshot for packages."""
 
