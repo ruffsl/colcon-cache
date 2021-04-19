@@ -138,7 +138,8 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
 
             # TODO: workaround by hard coding pkg.type to dirhash for entry point
             # extension = get_task_extension('colcon_snapshot.task.capture', pkg.type)
-            extension = get_task_extension('colcon_snapshot.task.capture', 'dirhash')
+            # extension = get_task_extension('colcon_snapshot.task.capture', 'dirhash')
+            extension = get_task_extension('colcon_snapshot.task.capture', 'git')
             if not extension:
                 logger.warning(
                     "No task extension to 'snapshot capture' a '{pkg.type}' package"

@@ -44,7 +44,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         capture_snapshot.dump()
         return 0
 
-    def compute_current_checksum(self, args):
+    def compute_current_checksum(self, args):  # noqa: D102
         # Use the number of CPU cores
         jobs = os.cpu_count()
         with suppress(AttributeError):
