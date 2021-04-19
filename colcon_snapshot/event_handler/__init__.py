@@ -1,41 +1,34 @@
 # Copyright 2019 Dirk Thomas
+# Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
-import pathlib
-
-RESULT_FILENAME = 'colcon_{verb_name}.rc'
-
-TEST_FAILURE_RESULT = 'test failures'
+from colcon_snapshot.snapshot import SnapshotLockfile
+from colcon_snapshot.snapshot import get_lockfile_path
 
 
-def get_previous_result(package_build_base, verb_name):
+def get_previous_lockfile(package_build_base, verb_name):
     """
-    Get the result of a verb from the package build directory.
+    Get the lockfile of a verb from the package build directory.
 
     :param str package_build_base: The build directory of a package
     :param str verb_name: The invoked verb name
-    :returns: The previously persisted result, otherwise None
-    :rtype: str
+    :returns: The previously persisted lockfile, otherwise None
+    :rtype: SnapshotLockfile
     """
-    path = _get_result_path(package_build_base, verb_name)
+    path = get_lockfile_path(package_build_base, verb_name)
     if not path.exists():
         return None
-    return path.read_text().rstrip()
+    return SnapshotLockfile(path)
 
 
-def set_result(package_build_base, verb_name, result):
+def set_lockfile(package_build_base, verb_name, lockfile):
     """
-    Persist the result of a verb in the package build directory.
+    Persist the lockfile of a verb in the package build directory.
 
     :param str package_build_base: The build directory of a package
     :param str verb_name: The invoked verb name
-    :param str result: The result of the invocation
+    :param SnapshotLockfile lockfile: The lockfile of the invocation
     """
-    path = _get_result_path(package_build_base, verb_name)
+    path = get_lockfile_path(package_build_base, verb_name)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(str(result) + '\n')
-
-
-def _get_result_path(package_build_base, verb_name):
-    return pathlib.Path(
-        package_build_base) / RESULT_FILENAME.format_map(locals())
+    lockfile.dump(path)

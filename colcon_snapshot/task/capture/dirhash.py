@@ -35,7 +35,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         snapshot_base = Path(args.build_base, 'snapshot')
         snapshot_base.mkdir(parents=True, exist_ok=True)
         capture_snapshot_path = Path(
-            snapshot_base, 'colcon_snapshot_capture.yaml')
+            snapshot_base, 'colcon_snapshot.yaml')
         capture_snapshot = SnapshotLockfile(capture_snapshot_path)
 
         entry_data = capture_snapshot.get_entry(ENTRY_TYPE)
@@ -43,8 +43,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         entry_data['current_checksum'] = self.compute_current_checksum(args)
         capture_snapshot.set_entry(ENTRY_TYPE, entry_data)
 
-        capture_snapshot.dump()
-        return 0
+        return capture_snapshot
 
     def compute_current_checksum(self, args):  # noqa: D102
         # Use the number of CPU cores
