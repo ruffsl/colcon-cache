@@ -19,6 +19,4 @@ subparser
 subparsers
 subverb
 thomas
-todo
-workaround
 yaml

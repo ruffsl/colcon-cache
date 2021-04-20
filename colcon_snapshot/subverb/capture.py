@@ -96,12 +96,6 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
         jobs, unselected_packages = self._get_jobs(
             context.args, decorators)
 
-        # TODO: OnError.continue_ is a workaround given rc need not be 0
-        # on_error = OnError.interrupt \
-        #     if not context.args.continue_on_error \
-        #     else OnError.skip_downstream
-        on_error = OnError.continue_
-
         def post_unselected_packages(*, event_queue):
             nonlocal unselected_packages
             names = [pkg.name for pkg in unselected_packages]
@@ -109,6 +103,7 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
                 event_queue.put(
                     (JobUnselected(name), None))
 
+        on_error = OnError.continue_
         rc = execute_jobs(
             context, jobs, on_error=on_error,
             pre_execution_callback=post_unselected_packages)
