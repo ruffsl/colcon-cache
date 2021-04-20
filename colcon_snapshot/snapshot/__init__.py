@@ -20,6 +20,20 @@ class SnapshotLockfile:
         self._lockdata = lockdata
         self._path = path
 
+    def __eq__(self, other):
+        if not isinstance(other, SnapshotLockfile):
+            return False
+        # only ensure other at least includes all of self
+        for entry_key, self_value in self._lockdata['entry'].items():
+            if entry_key in other._lockdata['entry']:
+                other_value = other._lockdata['entry'][entry_key]
+                if (self_value['current_checksum'] !=
+                        other_value['current_checksum']):
+                    return False
+            else:
+                return False
+        return True
+
     def get_entry(self, entry_type):  # noqa: D102
         if entry_type in self._lockdata['entry']:
             return self._lockdata['entry'][entry_type]
