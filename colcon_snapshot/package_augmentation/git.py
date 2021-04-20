@@ -30,7 +30,5 @@ class GitPackageAugmentation(PackageAugmentationExtensionPoint):
         # since this extension can contribute meta information to any package
         repo = Repo(desc.path, search_parent_directories=True)
         if repo is not None:
-            data = {
-                'vcs_type': VCS_TYPE,
-            }
+            data = {'vcs_type': VCS_TYPE}
             update_descriptor(desc, data, additional_argument_names=['*'])

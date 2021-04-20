@@ -23,7 +23,6 @@ class DefaultPackageAugmentation(PackageAugmentationExtensionPoint):
     ):
         # deliberately ignore the package type
         # since this extension can contribute meta information to any package
-        data = {
-            'vcs_type': VCS_TYPE,
-        }
-        update_descriptor(desc, data, additional_argument_names=['*'])
+        if 'vcs_type' not in desc.metadata:
+            data = {'vcs_type': VCS_TYPE}
+            update_descriptor(desc, data, additional_argument_names=['*'])
