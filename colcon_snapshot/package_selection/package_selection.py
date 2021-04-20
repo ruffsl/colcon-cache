@@ -96,6 +96,7 @@ class SnapshotPackageSelectionExtension(PackageSelectionExtensionPoint):
             reference_lockfile = get_previous_lockfile(
                 package_build_base, reference_name)
 
+            package_kind = None
             missing_kind = None
             if verb_lockfile is None:
                 missing_kind = verb_name
@@ -104,31 +105,18 @@ class SnapshotPackageSelectionExtension(PackageSelectionExtensionPoint):
 
             if args.packages_select_build_cache_miss or
                     args.packages_select_test_cache_miss:
-                package_kind = None
                 if missing_kind == reference_name:
                     package_kind = "missing "
                         "{reference_name} lockfile".format_map(locals())
-                elif missing_kind is None:
-                    if verb_lockfile == reference_lockfile:
-                        package_kind = "matching "
-                            "{verb_name} and {reference_name}"
-                            "lockfiles".format_map(locals())
-                if package_kind is not None:
-                    logger.info(
-                        "Skipping {package_kind} package '{pkg.name}' in "
-                        "'{pkg.path}'".format_map(locals()))
-                    decorator.selected = False
 
-            if args.packages_skip_build_cache_hit or
-                    args.packages_skip_test_cache_hit:
-                package_kind = None
-                if missing_kind is None:
-                    if verb_lockfile == reference_lockfile:
-                        package_kind = "matching "
-                            "{verb_name} and {reference_name}"
-                            "lockfiles".format_map(locals())
-                if package_kind is not None:
-                    logger.info(
-                        "Skipping {package_kind} package '{pkg.name}' in "
-                        "'{pkg.path}'".format_map(locals()))
-                    decorator.selected = False
+            if missing_kind is None:
+                if reference_lockfile == verb_lockfile:
+                    package_kind = "matching "
+                        "{reference_name} and {verb_name}"
+                        "lockfiles".format_map(locals())
+
+            if package_kind is not None:
+                logger.info(
+                    "Skipping {package_kind} package '{pkg.name}' in "
+                    "'{pkg.path}'".format_map(locals()))
+                decorator.selected = False
