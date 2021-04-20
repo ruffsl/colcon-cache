@@ -105,14 +105,14 @@ class SnapshotPackageSelectionExtension(PackageSelectionExtensionPoint):
             if (args.packages_select_build_cache_miss or
                     args.packages_select_test_cache_miss):
                 if missing_kind == reference_name:
-                    package_kind = ("missing "
-                        "{reference_name} lockfile".format_map(locals()))
+                    package_kind = ('missing {reference_name} lockfile'
+                                    .format_map(locals()))
 
             if missing_kind is None:
                 if reference_lockfile == verb_lockfile:
-                    package_kind = ("matching "
-                        "{reference_name} and {verb_name}"
-                        "lockfiles".format_map(locals()))
+                    package_kind = ('matching {reference_name} and '
+                                    '{verb_name} lockfiles'
+                                    .format_map(locals()))
 
             if package_kind is not None:
                 logger.info(

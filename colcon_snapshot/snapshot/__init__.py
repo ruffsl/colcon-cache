@@ -20,7 +20,7 @@ class SnapshotLockfile:
         self._lockdata = lockdata
         self._path = path
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # noqa: D105
         if not isinstance(other, SnapshotLockfile):
             return False
         # only ensure other at least includes all of self
