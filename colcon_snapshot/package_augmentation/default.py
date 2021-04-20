@@ -10,9 +10,7 @@ VCS_TYPE = 'default'
 
 
 class DefaultPackageAugmentation(PackageAugmentationExtensionPoint):
-    """
-    Augment packages using no version control system.
-    """
+    """Augment packages using no version control system."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -20,9 +18,9 @@ class DefaultPackageAugmentation(PackageAugmentationExtensionPoint):
             PackageAugmentationExtensionPoint.EXTENSION_POINT_VERSION,
             '^1.0')
 
-    def augment_package(
+    def augment_package(  # noqa: D102
         self, desc, *, additional_argument_names=None
-    ):  # noqa: D102
+    ):
         # deliberately ignore the package type
         # since this extension can contribute meta information to any package
         data = {

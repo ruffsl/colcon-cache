@@ -11,9 +11,8 @@ VCS_TYPE = 'git'
 
 
 class GitPackageAugmentation(PackageAugmentationExtensionPoint):
-    """
-    Augment packages using git version control system.
-    """
+    """Augment packages using git version control system."""
+
     # the priority needs to be lower than the default extensions
     # augmenting packages using no version control system
     PRIORITY = 90
@@ -24,9 +23,9 @@ class GitPackageAugmentation(PackageAugmentationExtensionPoint):
             PackageAugmentationExtensionPoint.EXTENSION_POINT_VERSION,
             '^1.0')
 
-    def augment_package(
+    def augment_package(  # noqa: D102
         self, desc, *, additional_argument_names=None
-    ):  # noqa: D102
+    ):
         # deliberately ignore the package type
         # since this extension can contribute meta information to any package
         repo = Repo(desc.path, search_parent_directories=True)
