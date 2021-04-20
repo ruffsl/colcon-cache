@@ -7,7 +7,6 @@ import os
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
-from colcon_core.subprocess import SIGINT_RESULT
 from colcon_snapshot.event_handler \
     import get_previous_lockfile
 
@@ -103,17 +102,17 @@ class SnapshotPackageSelectionExtension(PackageSelectionExtensionPoint):
             if reference_lockfile is None:
                 missing_kind = reference_name
 
-            if args.packages_select_build_cache_miss or
-                    args.packages_select_test_cache_miss:
+            if (args.packages_select_build_cache_miss or
+                    args.packages_select_test_cache_miss):
                 if missing_kind == reference_name:
-                    package_kind = "missing "
-                        "{reference_name} lockfile".format_map(locals())
+                    package_kind = ("missing "
+                        "{reference_name} lockfile".format_map(locals()))
 
             if missing_kind is None:
                 if reference_lockfile == verb_lockfile:
-                    package_kind = "matching "
+                    package_kind = ("matching "
                         "{reference_name} and {verb_name}"
-                        "lockfiles".format_map(locals())
+                        "lockfiles".format_map(locals()))
 
             if package_kind is not None:
                 logger.info(
