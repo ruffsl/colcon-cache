@@ -60,9 +60,10 @@ class StoreLockfileEventHandler(EventHandlerExtensionPoint):
 
             if job in self._test_failures:
                 return
-            if data.rc != '0':
+            if str(data.rc) != '0':
                 if verb_name != 'snapshot':
                     return
 
-            set_lockfile(
-                job.task_context.args.build_base, verb_name, lockfile)
+            if lockfile is not None:
+                set_lockfile(
+                    job.task_context.args.build_base, verb_name, lockfile)
