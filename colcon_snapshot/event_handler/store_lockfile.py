@@ -42,7 +42,7 @@ class StoreLockfileEventHandler(EventHandlerExtensionPoint):
             if isinstance(job.task_context.args,
                           CaptureSnapshotPackageArguments):
                 verb_name = 'snapshot'
-                lockfile = data.rc
+                lockfile = job.task_context.pkg.metadata['lockfile']
             elif isinstance(job.task_context.args,
                             BuildPackageArguments):
                 verb_name = 'build'
