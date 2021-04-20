@@ -1,4 +1,5 @@
 # Copyright 2019 Dirk Thomas
+# Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
 import os
@@ -7,12 +8,12 @@ from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.subprocess import SIGINT_RESULT
-from colcon_package_selection.package_selection.previous \
-    import get_previous_result
+from colcon_snapshot.event_handler \
+    import get_previous_lockfile
 
 
-class PreviousPackageSelectionExtension(PackageSelectionExtensionPoint):
-    """Skip a set of packages based on results of previous invocations."""
+class SnapshotPackageSelectionExtension(PackageSelectionExtensionPoint):
+    """Skip a set of packages based on lockfiles from previous snapshots."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -22,41 +23,41 @@ class PreviousPackageSelectionExtension(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-build-failed', action='store_true',
+            '--packages-select-build-cache-miss', action='store_true',
             help='Only process a subset of packages which have failed to '
                  'build previously (aborted packages are not '
                  'considered errors)')
         group.add_argument(
-            '--packages-skip-build-finished', action='store_true',
+            '--packages-skip-build-cache-hit', action='store_true',
             help='Skip a set of packages which have finished to build '
                  'previously')
         group.add_argument(
-            '--packages-select-test-failures', action='store_true',
+            '--packages-select-test-cache-miss', action='store_true',
             help='Only process a subset of packages which had test failures '
                  'previously')
         group.add_argument(
-            '--packages-skip-test-passed', action='store_true',
+            '--packages-skip-test-cache-hit', action='store_true',
             help='Skip a set of packages which had no test failures '
                  'previously')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_build_failed,
-            args.packages_skip_build_finished,
-            args.packages_select_test_failures,
-            args.packages_skip_test_passed,
+            args.packages_select_build_cache_miss,
+            args.packages_skip_build_cache_hit,
+            args.packages_select_test_cache_miss,
+            args.packages_skip_test_cache_hit,
         )):
             return
 
         if not hasattr(args, 'build_base'):
-            if args.packages_select_build_failed:
-                argument = '--packages-select-build-failed'
-            elif args.packages_skip_build_finished:
-                argument = '--packages-skip-build-finished'
-            elif args.packages_select_test_failures:
-                argument = '--packages-select-test-failures'
-            elif args.packages_skip_test_passed:
-                argument = '--packages-skip-test-passed'
+            if args.packages_select_build_cache_miss:
+                argument = '--packages-select-build-cache-miss'
+            elif args.packages_skip_build_cache_hit:
+                argument = '--packages-skip-build-cache-hit'
+            elif args.packages_select_test_cache_miss:
+                argument = '--packages-select-test-cache-miss'
+            elif args.packages_skip_test_cache_hit:
+                argument = '--packages-skip-test-cache-hit'
             else:
                 assert False
             logger.warning(
@@ -74,59 +75,60 @@ class PreviousPackageSelectionExtension(PackageSelectionExtensionPoint):
             pkg = decorator.descriptor
 
             if (
-                args.packages_select_build_failed or
-                args.packages_skip_build_finished
+                args.packages_select_build_cache_miss or
+                args.packages_skip_build_cache_hit
             ):
                 verb_name = 'build'
+                reference_name = 'snapshot'
             elif (
-                args.packages_select_test_failures or
-                args.packages_skip_test_passed
+                args.packages_select_test_cache_miss or
+                args.packages_skip_test_cache_hit
             ):
                 verb_name = 'test'
+                reference_name = 'build'
             else:
                 assert False
 
-            previous_result = get_previous_result(
-                os.path.join(args.build_base, pkg.name), verb_name)
+            package_build_base = os.path.join(
+                args.build_base, pkg.name)
+            verb_lockfile = get_previous_lockfile(
+                package_build_base, verb_name)
+            reference_lockfile = get_previous_lockfile(
+                package_build_base, reference_name)
 
-            if args.packages_select_build_failed:
+            missing_kind = None
+            if verb_lockfile is None:
+                missing_kind = verb_name
+            if reference_lockfile is None:
+                missing_kind = reference_name
+
+            if args.packages_select_build_cache_miss or
+                    args.packages_select_test_cache_miss:
                 package_kind = None
-                if previous_result is None:
-                    package_kind = 'not previously built'
-                elif previous_result == SIGINT_RESULT:
-                    package_kind = 'previously aborted'
-                elif previous_result == '0':
-                    package_kind = 'previously built'
+                if missing_kind == reference_name:
+                    package_kind = "missing "
+                        "{reference_name} lockfile".format_map(locals())
+                elif missing_kind is None:
+                    if verb_lockfile == reference_lockfile:
+                        package_kind = "matching "
+                            "{verb_name} and {reference_name}"
+                            "lockfiles".format_map(locals())
                 if package_kind is not None:
                     logger.info(
                         "Skipping {package_kind} package '{pkg.name}' in "
                         "'{pkg.path}'".format_map(locals()))
                     decorator.selected = False
 
-            if args.packages_skip_build_finished:
-                if previous_result == '0':
-                    logger.info(
-                        "Skipping previously built package '{pkg.name}' in "
-                        "'{pkg.path}'".format_map(locals()))
-                    decorator.selected = False
-
-            if args.packages_select_test_failures:
+            if args.packages_skip_build_cache_hit or
+                    args.packages_skip_test_cache_hit:
                 package_kind = None
-                if previous_result is None:
-                    package_kind = 'not previously tested'
-                elif previous_result == SIGINT_RESULT:
-                    package_kind = 'previously aborted'
-                elif previous_result == '0':
-                    package_kind = 'previously tested'
+                if missing_kind is None:
+                    if verb_lockfile == reference_lockfile:
+                        package_kind = "matching "
+                            "{verb_name} and {reference_name}"
+                            "lockfiles".format_map(locals())
                 if package_kind is not None:
                     logger.info(
                         "Skipping {package_kind} package '{pkg.name}' in "
-                        "'{pkg.path}'".format_map(locals()))
-                    decorator.selected = False
-
-            if args.packages_skip_test_passed:
-                if previous_result == '0':
-                    logger.info(
-                        "Skipping previously tested package '{pkg.name}' in "
                         "'{pkg.path}'".format_map(locals()))
                     decorator.selected = False
