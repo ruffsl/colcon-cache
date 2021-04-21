@@ -61,8 +61,7 @@ class StoreLockfileEventHandler(EventHandlerExtensionPoint):
             if job in self._test_failures:
                 return
             if str(data.rc) != '0':
-                if verb_name != 'cache':
-                    return
+                return
 
             if lockfile is not None:
                 set_lockfile(
