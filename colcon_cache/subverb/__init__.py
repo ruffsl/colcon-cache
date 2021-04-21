@@ -9,23 +9,23 @@ from colcon_core.plugin_system import order_extensions_by_name
 logger = colcon_logger.getChild(__name__)
 
 
-class SnapshotSubverbExtensionPoint:
+class CacheSubverbExtensionPoint:
     """
-    The interface for snapshot subverb extensions.
+    The interface for cache subverb extensions.
 
-    A snapshot subverb extension provides a subverb to the `snapshot` verb of
+    A cache subverb extension provides a subverb to the `cache` verb of
     the command line tool.
 
     For each instance the attribute `SUBVERB_NAME` is being set to the basename
     of the entry point registering the extension.
     """
 
-    """The version of the snapshot subverb extension interface."""
+    """The version of the cache subverb extension interface."""
     EXTENSION_POINT_VERSION = '1.0'
 
     def add_arguments(self, *, parser):
         """
-        Add command line arguments specific to the snapshot subverb.
+        Add command line arguments specific to the cache subverb.
 
         The method is intended to be overridden in a subclass.
 
@@ -35,7 +35,7 @@ class SnapshotSubverbExtensionPoint:
 
     def main(self, *, context):
         """
-        Execute the snapshot subverb extension logic.
+        Execute the cache subverb extension logic.
 
         This method must be overridden in a subclass.
 

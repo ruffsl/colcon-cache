@@ -6,16 +6,16 @@ from colcon_core.package_selection import add_arguments \
     as add_packages_arguments
 from colcon_core.package_selection import get_package_descriptors
 from colcon_core.plugin_system import satisfies_version
-from colcon_snapshot.subverb import SnapshotSubverbExtensionPoint
+from colcon_cache.subverb import CacheSubverbExtensionPoint
 
 
-class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
-    """Capture current snapshot for packages."""
+class CaptureCacheSubverb(CacheSubverbExtensionPoint):
+    """Capture current cache for packages."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
         satisfies_version(
-            SnapshotSubverbExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
+            CacheSubverbExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
 
     def add_arguments(self, *, parser):  # noqa: D102
         # only added so that package selection arguments can be used

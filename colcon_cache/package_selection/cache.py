@@ -7,12 +7,12 @@ import os
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
-from colcon_snapshot.event_handler \
+from colcon_cache.event_handler \
     import get_previous_lockfile
 
 
-class SnapshotPackageSelectionExtension(PackageSelectionExtensionPoint):
-    """Skip a set of packages based on lockfiles from previous snapshots."""
+class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
+    """Skip a set of packages based on lockfiles from previous caches."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -78,7 +78,7 @@ class SnapshotPackageSelectionExtension(PackageSelectionExtensionPoint):
                 args.packages_skip_build_cache_hit
             ):
                 verb_name = 'build'
-                reference_name = 'snapshot'
+                reference_name = 'cache'
             elif (
                 args.packages_select_test_cache_miss or
                 args.packages_skip_test_cache_hit
