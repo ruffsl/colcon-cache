@@ -22,41 +22,27 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-build-cache-miss', action='store_true',
+            '--packages-select-cache-miss', action='store_true',
             help='Only process a subset of packages which have failed to '
                  'build previously (aborted packages are not '
                  'considered errors)')
         group.add_argument(
-            '--packages-skip-build-cache-hit', action='store_true',
+            '--packages-skip-cache-hit', action='store_true',
             help='Skip a set of packages which have finished to build '
-                 'previously')
-        group.add_argument(
-            '--packages-select-test-cache-miss', action='store_true',
-            help='Only process a subset of packages which had test failures '
-                 'previously')
-        group.add_argument(
-            '--packages-skip-test-cache-hit', action='store_true',
-            help='Skip a set of packages which had no test failures '
                  'previously')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_build_cache_miss,
-            args.packages_skip_build_cache_hit,
-            args.packages_select_test_cache_miss,
-            args.packages_skip_test_cache_hit,
+            args.packages_select_cache_miss,
+            args.packages_skip_cache_hit,
         )):
             return
 
         if not hasattr(args, 'build_base'):
             if args.packages_select_build_cache_miss:
-                argument = '--packages-select-build-cache-miss'
+                argument = '--packages-select-cache-miss'
             elif args.packages_skip_build_cache_hit:
-                argument = '--packages-skip-build-cache-hit'
-            elif args.packages_select_test_cache_miss:
-                argument = '--packages-select-test-cache-miss'
-            elif args.packages_skip_test_cache_hit:
-                argument = '--packages-skip-test-cache-hit'
+                argument = '--packages-skip-cache-hit'
             else:
                 assert False
             logger.warning(
@@ -73,17 +59,12 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
 
             pkg = decorator.descriptor
 
-            if (
-                args.packages_select_build_cache_miss or
-                args.packages_skip_build_cache_hit
-            ):
-                verb_name = 'build'
+            # dargs = vars(args.subverb_name)
+            verb_name = args.subverb_name
+
+            if verb_name == 'build':
                 reference_name = 'cache'
-            elif (
-                args.packages_select_test_cache_miss or
-                args.packages_skip_test_cache_hit
-            ):
-                verb_name = 'test'
+            elif verb_name == 'test':
                 reference_name = 'build'
             else:
                 assert False
@@ -102,8 +83,7 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             if reference_lockfile is None:
                 missing_kind = reference_name
 
-            if (args.packages_select_build_cache_miss or
-                    args.packages_select_test_cache_miss):
+            if args.packages_select_cache_miss:
                 if missing_kind == reference_name:
                     package_kind = ('missing {reference_name} lockfile'
                                     .format_map(locals()))
