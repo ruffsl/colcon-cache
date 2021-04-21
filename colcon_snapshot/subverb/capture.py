@@ -27,15 +27,15 @@ from colcon_core.verb import check_and_mark_build_tool
 from colcon_core.verb import logger
 from colcon_core.verb import update_object
 
-from colcon_snapshot.subverb import SnapshotSubverbExtensionPoint
+from colcon_cache.subverb import CacheSubverbExtensionPoint
 
 
-class CaptureSnapshotPackageArguments:
-    """Arguments to snapshot capture a specific package."""
+class CaptureCachePackageArguments:
+    """Arguments to cache capture a specific package."""
 
     def __init__(self, pkg, args, *, additional_destinations=None):
         """
-        Construct a CaptureSnapshotPackageArguments.
+        Construct a CaptureCachePackageArguments.
 
         :param pkg: The package descriptor
         :param args: The parsed command line arguments
@@ -54,21 +54,21 @@ class CaptureSnapshotPackageArguments:
             if hasattr(args, dest):
                 update_object(
                     self, dest, getattr(args, dest),
-                    pkg.name, 'snapshot capture', 'command line')
+                    pkg.name, 'cache capture', 'command line')
             # from the package metadata
             if dest in pkg.metadata:
                 update_object(
                     self, dest, pkg.metadata[dest],
-                    pkg.name, 'snapshot capture', 'package metadata')
+                    pkg.name, 'cache capture', 'package metadata')
 
 
-class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
-    """Capture current snapshot for packages."""
+class CaptureCacheSubverb(CacheSubverbExtensionPoint):
+    """Capture current cache for packages."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
         satisfies_version(
-            SnapshotSubverbExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
+            CacheSubverbExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
 
     def add_arguments(self, *, parser):  # noqa: D102
         parser.add_argument(
@@ -80,7 +80,7 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
         add_packages_arguments(parser)
 
         decorated_parser = DestinationCollectorDecorator(parser)
-        add_task_arguments(decorated_parser, 'colcon_snapshot.task.capture')
+        add_task_arguments(decorated_parser, 'colcon_cache.task.capture')
         self.task_argument_destinations = decorated_parser.get_destinations()
 
     def main(self, *, context):  # noqa: D102
@@ -133,15 +133,15 @@ class CaptureSnapshotSubverb(SnapshotSubverbExtensionPoint):
                 continue
 
             extension = get_task_extension(
-                'colcon_snapshot.task.capture', pkg.metadata['vcs_type'])
+                'colcon_cache.task.capture', pkg.metadata['vcs_type'])
             if not extension:
                 logger.warning(
-                    "No task extension to 'snapshot capture' "
+                    "No task extension to 'cache capture' "
                     "a '{pkg.type}' package"
                     .format_map(locals()))
                 continue
 
-            package_args = CaptureSnapshotPackageArguments(
+            package_args = CaptureCachePackageArguments(
                 pkg, args, additional_destinations=self
                 .task_argument_destinations.values())
             ordered_package_args = ', '.join([

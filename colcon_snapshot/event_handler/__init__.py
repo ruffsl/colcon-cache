@@ -2,8 +2,8 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
-from colcon_snapshot.snapshot import SnapshotLockfile
-from colcon_snapshot.snapshot import get_lockfile_path
+from colcon_cache.cache import CacheLockfile
+from colcon_cache.cache import get_lockfile_path
 
 
 def get_previous_lockfile(package_build_base, verb_name):
@@ -13,12 +13,12 @@ def get_previous_lockfile(package_build_base, verb_name):
     :param str package_build_base: The build directory of a package
     :param str verb_name: The invoked verb name
     :returns: The previously persisted lockfile, otherwise None
-    :rtype: SnapshotLockfile
+    :rtype: CacheLockfile
     """
     path = get_lockfile_path(package_build_base, verb_name)
     if not path.exists():
         return None
-    return SnapshotLockfile(path)
+    return CacheLockfile(path)
 
 
 def set_lockfile(package_build_base, verb_name, lockfile):
@@ -27,7 +27,7 @@ def set_lockfile(package_build_base, verb_name, lockfile):
 
     :param str package_build_base: The build directory of a package
     :param str verb_name: The invoked verb name
-    :param SnapshotLockfile lockfile: The lockfile of the invocation
+    :param CacheLockfile lockfile: The lockfile of the invocation
     """
     path = get_lockfile_path(package_build_base, verb_name)
     path.parent.mkdir(parents=True, exist_ok=True)

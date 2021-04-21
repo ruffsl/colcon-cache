@@ -21,7 +21,7 @@ def known_words():
 def test_spell_check(known_words):
     source_filenames = [Path(__file__).parents[1] / 'setup.py'] + \
         list(
-            (Path(__file__).parents[1] / 'colcon_snapshot')
+            (Path(__file__).parents[1] / 'colcon_cache')
             .glob('**/*.py')) + \
         list((Path(__file__).parents[1] / 'test').glob('**/*.py'))
 

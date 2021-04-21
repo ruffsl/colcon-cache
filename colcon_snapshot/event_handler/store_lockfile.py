@@ -8,10 +8,10 @@ from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.verb.build import BuildPackageArguments
 from colcon_core.verb.test import TestPackageArguments
-from colcon_snapshot.event_handler \
+from colcon_cache.event_handler \
     import get_previous_lockfile, set_lockfile
-from colcon_snapshot.subverb.capture \
-    import CaptureSnapshotPackageArguments
+from colcon_cache.subverb.capture \
+    import CaptureCachePackageArguments
 
 
 class StoreLockfileEventHandler(EventHandlerExtensionPoint):
@@ -40,15 +40,15 @@ class StoreLockfileEventHandler(EventHandlerExtensionPoint):
             job = event[1]
 
             if isinstance(job.task_context.args,
-                          CaptureSnapshotPackageArguments):
-                verb_name = 'snapshot'
+                          CaptureCachePackageArguments):
+                verb_name = 'cache'
                 lockfile = job.task_context.pkg.metadata['lockfile']
             elif isinstance(job.task_context.args,
                             BuildPackageArguments):
                 verb_name = 'build'
                 lockfile = get_previous_lockfile(
                     job.task_context.args.build_base,
-                    'snapshot')
+                    'cache')
             elif isinstance(job.task_context.args,
                             TestPackageArguments):
                 verb_name = 'test'
@@ -61,7 +61,7 @@ class StoreLockfileEventHandler(EventHandlerExtensionPoint):
             if job in self._test_failures:
                 return
             if str(data.rc) != '0':
-                if verb_name != 'snapshot':
+                if verb_name != 'cache':
                     return
 
             if lockfile is not None:

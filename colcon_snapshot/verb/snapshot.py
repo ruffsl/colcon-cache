@@ -5,11 +5,11 @@
 from colcon_core.command import add_subparsers
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.verb import VerbExtensionPoint
-from colcon_snapshot.subverb import get_subverb_extensions
+from colcon_cache.subverb import get_subverb_extensions
 
 
-class SnapshotVerb(VerbExtensionPoint):
-    """Manage snapshots of packages."""
+class CacheVerb(VerbExtensionPoint):
+    """Manage caches of packages."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -23,7 +23,7 @@ class SnapshotVerb(VerbExtensionPoint):
         # get subverb extensions and let them add their arguments
         subverb_extensions = get_subverb_extensions()
         add_subparsers(
-            parser, 'colcon snapshot', subverb_extensions,
+            parser, 'colcon cache', subverb_extensions,
             attribute='subverb_name')
 
     def main(self, *, context):  # noqa: D102

@@ -7,8 +7,8 @@ import yaml
 LOCKFILE_FILENAME = 'colcon_{verb_name}.yaml'
 
 
-class SnapshotLockfile:
-    """Capture current snapshot for packages."""
+class CacheLockfile:
+    """Capture current cache for packages."""
 
     def __init__(self, path):  # noqa: D107
         if path.exists():
@@ -21,7 +21,7 @@ class SnapshotLockfile:
         self._path = path
 
     def __eq__(self, other):  # noqa: D105
-        if not isinstance(other, SnapshotLockfile):
+        if not isinstance(other, CacheLockfile):
             return False
         # only ensure other at least includes all of self
         for entry_key, self_value in self._lockdata['entry'].items():
@@ -61,5 +61,5 @@ def get_lockfile_path(package_build_base, verb_name):
     """
     return pathlib.Path(
         package_build_base,
-        'snapshot',
+        'cache',
         LOCKFILE_FILENAME.format_map(locals()))

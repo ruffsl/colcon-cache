@@ -1,3 +1,3 @@
-# colcon-snapshot
+# colcon-cache
 
-An extension for [colcon-core](https://github.com/colcon/colcon-core) to snapshot packages for processing.
+An extension for [colcon-core](https://github.com/colcon/colcon-core) to cache packages for processing.
