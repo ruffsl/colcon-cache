@@ -42,7 +42,7 @@ class GitCaptureTask(TaskExtensionPoint):
         capture_cache.set_entry(ENTRY_TYPE, entry_data)
         pkg.metadata['lockfile'] = capture_cache
 
-        return '0'
+        return 0
 
     def compute_current_checksum(self, args):  # noqa: D102
         repo = Repo(args.path, search_parent_directories=True)

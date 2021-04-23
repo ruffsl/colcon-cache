@@ -44,7 +44,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         capture_cache.set_entry(ENTRY_TYPE, entry_data)
         pkg.metadata['lockfile'] = capture_cache
 
-        return '0'
+        return 0
 
     def compute_current_checksum(self, args):  # noqa: D102
         # Use the number of CPU cores
