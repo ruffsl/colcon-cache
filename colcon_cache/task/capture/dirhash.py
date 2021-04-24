@@ -26,7 +26,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
 
     def add_arguments(self, *, parser):  # noqa: D102
         parser.add_argument(
-            '-a', '--algorithm',
+            '--dirhash-algorithm',
             choices=dirhash.algorithms_available,
             default='md5',
             help=(
@@ -47,21 +47,21 @@ class DirhashCaptureTask(TaskExtensionPoint):
             description=(
                 'Specify what files and directories to include. All files and '
                 'directories (including symbolic links) are included by default. The '
-                '--match/--ignore arguments allows for selection using glob/wildcard '
+                '--dirhash-match/--dirhash-ignore arguments allows for selection using glob/wildcard '
                 '(".gitignore style") path matching. Paths relative to the root '
                 '`directory` (i.e. excluding the name of the root directory itself) are '
                 'matched against the provided patterns. For example, to only include '
                 'python source files, use: `dirhash path/to/dir -m "*.py"` or to '
                 'exclude hidden files and directories use: '
                 '`dirhash path/to.dir -i ".*" ".*/"` which is short for '
-                '`dirhash path/to.dir -m "*" "!.*" "!.*/"`. By adding the --list '
+                '`dirhash path/to.dir -m "*" "!.*" "!.*/"`. By adding the --dirhash-list '
                 'argument, all included paths, for the given filtering arguments, are '
                 'returned instead of the hash value. For further details see '
                 'https://github.com/andhus/dirhash/README.md#filtering'
             )
         )
         filter_options.add_argument(
-            '-m', '--match',
+            '--dirhash-match',
             nargs='+',
             default=['*'],
             help=(
@@ -72,7 +72,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
             metavar=''
         )
         filter_options.add_argument(
-            '-i', '--ignore',
+            '--dirhash-ignore',
             nargs='+',
             default=None,
             help=(
@@ -83,20 +83,20 @@ class DirhashCaptureTask(TaskExtensionPoint):
             metavar=''
         )
         filter_options.add_argument(
-            '--empty-dirs',
+            '--dirhash-empty-dirs',
             action='store_true',
             default=False,
             help='Include empty directories (containing no files that meet the matching '
                 'criteria and no non-empty sub directories).'
         )
         filter_options.add_argument(
-            '--no-linked-dirs',
+            '--dirhash-no-linked-dirs',
             dest='linked_dirs',
             action='store_false',
             help='Do not include symbolic links to other directories.'
         )
         filter_options.add_argument(
-            '--no-linked-files',
+            '--dirhash-no-linked-files',
             dest='linked_files',
             action='store_false',
             help='Do not include symbolic links to files.'
@@ -112,7 +112,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
             )
         )
         protocol_options.add_argument(
-            '-p', '--properties',
+            '--dirhash-properties',
             nargs='+',
             dest='entry_properties',
             default=['data', 'name'],
@@ -125,7 +125,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
             metavar=''
         )
         protocol_options.add_argument(
-            '-c', '--allow-cyclic-links',
+            '--dirhash-allow-cyclic-links',
             default=False,
             action='store_true',
             help=(
@@ -139,13 +139,13 @@ class DirhashCaptureTask(TaskExtensionPoint):
             description=''
         )
         implementation_options.add_argument(
-            '-s', '--chunk-size',
+            '--dirhash-chunk-size',
             default=2**20,
             type=int,
             help='The chunk size (in bytes) for reading of files.'
         )
         implementation_options.add_argument(
-            '-j', '--jobs',
+            '--dirhash-jobs',
             type=int,
             default=1,  # TODO make default number of cores?
             help='Number of jobs (parallel processes) to use.'
