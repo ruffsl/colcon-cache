@@ -26,12 +26,12 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
         group.add_argument(
             '--packages-select-cache-miss', action='store_true',
             help='Only process a subset of packages that miss its '
-                 'refrence cache (packages without a refrence cache '
+                 'reference cache (packages without a reference cache '
                  'are not considered as cache miss)')
         group.add_argument(
             '--packages-skip-cache-hit', action='store_true',
             help='Skip a set of packages which hit its '
-                 'refrence cache (packages without a verb cache '
+                 'reference cache (packages without a verb cache '
                  'are not considered as cache hit)')
 
     def select_packages(self, args, decorators):  # noqa: D102
@@ -64,7 +64,7 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
         else:
             logger.warning(
                 "Ignoring '{argument}' since the invoked verb doesn't have a "
-                "colcon cache verb handler extention and therefore can't "
+                "colcon cache verb handler extension and therefore can't "
                 'access information about the previous state of a package'
                 .format_map(locals()))
             return
