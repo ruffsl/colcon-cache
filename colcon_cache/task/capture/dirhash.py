@@ -10,7 +10,7 @@ from colcon_cache.cache import CacheLockfile
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
-from dirhash import dirhash
+import dirhash
 
 logger = colcon_logger.getChild(__name__)
 
@@ -87,7 +87,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
             action='store_true',
             default=False,
             help='Include empty directories (containing no files that meet the matching '
-                'criteria and no non-empty sub directories).'
+                 'criteria and no non-empty sub directories).'
         )
         filter_options.add_argument(
             '--dirhash-no-linked-dirs',
@@ -184,4 +184,4 @@ class DirhashCaptureTask(TaskExtensionPoint):
             jobs = 1
 
         # ignore all . files and . folders
-        return dirhash(args.path, 'md5', ignore=['.*'], jobs=jobs)
+        return dirhash.dirhash(args.path, 'md5', ignore=['.*'], jobs=jobs)
