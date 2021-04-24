@@ -23,13 +23,14 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
             '--packages-select-cache-miss', action='store_true',
-            help='Only process a subset of packages which have failed to '
-                 'build previously (aborted packages are not '
-                 'considered errors)')
+            help='Only process a subset of packages that miss its '
+                 'refrence cache (packages without a refrence cache '
+                 'are not considered as cache miss)')
         group.add_argument(
             '--packages-skip-cache-hit', action='store_true',
-            help='Skip a set of packages which have finished to build '
-                 'previously')
+            help='Skip a set of packages which hit its '
+                 'refrence cache (packages without a verb cache '
+                 'are not considered as cache hit)')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
