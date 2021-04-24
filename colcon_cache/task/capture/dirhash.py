@@ -190,5 +190,12 @@ class DirhashCaptureTask(TaskExtensionPoint):
             # the number of cores can't be determined
             jobs = 1
 
-        # ignore all . files and . folders
-        return dirhash.dirhash(args.path, 'md5', ignore=['.*'], jobs=jobs)
+        kwargs = vars(args).copy()
+        kwargs['dirhash_directory'] = args.path
+
+        for key in list(kwargs.keys()):
+            if key.startswith('dirhash_'):
+                kwargs[key[len('dirhash_'):]] = kwargs.pop(key)
+            else:
+                kwargs.pop(key)
+        return dirhash.dirhash(**kwargs)
