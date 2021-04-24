@@ -4,11 +4,10 @@
 
 import os
 
+from colcon_cache.event_handler import get_previous_lockfile
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
-from colcon_cache.event_handler \
-    import get_previous_lockfile
 
 
 class LockPackageSelectionExtension(PackageSelectionExtensionPoint):

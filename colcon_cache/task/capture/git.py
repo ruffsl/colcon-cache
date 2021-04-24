@@ -4,10 +4,10 @@
 
 from pathlib import Path
 
+from colcon_cache.cache import CacheLockfile
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
-from colcon_cache.cache import CacheLockfile
 from git import Repo
 
 logger = colcon_logger.getChild(__name__)

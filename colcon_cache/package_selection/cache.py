@@ -4,13 +4,10 @@
 
 import os
 
+from colcon_cache.verb_handler import get_verb_handler_extensions
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
-from colcon_cache.event_handler \
-    import get_previous_lockfile
-from colcon_cache.verb_handler \
-    import get_verb_handler_extensions
 
 
 class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
@@ -79,10 +76,10 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             package_build_base = os.path.join(
                 args.build_base, pkg.name)
 
-            verb_lockfile = (verb_handler_extension
-                ).get_current_lockfile(package_build_base)
-            reference_lockfile = (verb_handler_extension
-                ).get_reference_lockfile(package_build_base)
+            verb_lockfile = verb_handler_extension\
+                .get_current_lockfile(package_build_base)
+            reference_lockfile = verb_handler_extension\
+                .get_reference_lockfile(package_build_base)
             reference_name = verb_handler_extension.reference_name
 
             package_kind = None

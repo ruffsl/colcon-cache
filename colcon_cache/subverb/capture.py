@@ -7,6 +7,7 @@ import os
 import os.path
 from pathlib import Path
 
+from colcon_cache.subverb import CacheSubverbExtensionPoint
 from colcon_core.argument_parser.destination_collector \
     import DestinationCollectorDecorator
 from colcon_core.event.job import JobUnselected
@@ -26,8 +27,6 @@ from colcon_core.task import TaskContext
 from colcon_core.verb import check_and_mark_build_tool
 from colcon_core.verb import logger
 from colcon_core.verb import update_object
-
-from colcon_cache.subverb import CacheSubverbExtensionPoint
 
 
 class CaptureCachePackageArguments:

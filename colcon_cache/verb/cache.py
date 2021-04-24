@@ -2,10 +2,10 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+from colcon_cache.subverb import get_subverb_extensions
 from colcon_core.command import add_subparsers
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.verb import VerbExtensionPoint
-from colcon_cache.subverb import get_subverb_extensions
 
 
 class CacheVerb(VerbExtensionPoint):

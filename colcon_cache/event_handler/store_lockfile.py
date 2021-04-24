@@ -2,18 +2,14 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+from colcon_cache.event_handler \
+    import set_lockfile
+from colcon_cache.verb_handler \
+    import get_verb_handler_extensions
 from colcon_core.event.job import JobEnded
 from colcon_core.event.test import TestFailure
 from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.plugin_system import satisfies_version
-from colcon_core.verb.build import BuildPackageArguments
-from colcon_core.verb.test import TestPackageArguments
-from colcon_cache.event_handler \
-    import get_previous_lockfile, set_lockfile
-from colcon_cache.subverb.capture \
-    import CaptureCachePackageArguments
-from colcon_cache.verb_handler \
-    import get_verb_handler_extensions
 
 
 class StoreLockfileEventHandler(EventHandlerExtensionPoint):

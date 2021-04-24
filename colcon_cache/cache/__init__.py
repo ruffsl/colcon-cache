@@ -2,6 +2,7 @@
 # Licensed under the Apache License, Version 2.0
 
 import pathlib
+
 import yaml
 
 LOCKFILE_FILENAME = 'colcon_{verb_name}.yaml'
@@ -34,9 +35,9 @@ class CacheLockfile:
                 return False
         return True
 
-    def is_changed(self):  # noqa: D105
+    def is_changed(self):  # noqa: D10s
         # only ensure other at least includes all of self
-        for entry_key, entry_value in self._lockdata['entry'].items():
+        for _, entry_value in self._lockdata['entry'].items():
             if (entry_value['current_checksum'] !=
                     entry_value['reference_checksum']):
                 return True
