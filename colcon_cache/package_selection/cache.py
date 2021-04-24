@@ -9,6 +9,8 @@ from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 from colcon_cache.event_handler \
     import get_previous_lockfile
+from colcon_cache.verb_handler \
+    import get_verb_handler_extensions
 
 
 class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
@@ -61,21 +63,21 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             pkg = decorator.descriptor
 
             verb_name = args.verb_name
-            if verb_name == 'cache':
-                reference_name = None
-            elif verb_name == 'build':
-                reference_name = 'cache'
-            elif verb_name == 'test':
-                reference_name = 'build'
+            verb_handler_extensions = get_verb_handler_extensions()
+
+            if verb_name in verb_handler_extensions:
+                verb_handler_extension = verb_handler_extensions[verb_name]
             else:
                 assert False
 
             package_build_base = os.path.join(
                 args.build_base, pkg.name)
-            verb_lockfile = get_previous_lockfile(
-                package_build_base, verb_name)
-            reference_lockfile = get_previous_lockfile(
-                package_build_base, reference_name)
+
+            verb_lockfile = (verb_handler_extension
+                ).get_current_lockfile(package_build_base)
+            reference_lockfile = (verb_handler_extension
+                ).get_reference_lockfile(package_build_base)
+            reference_name = verb_handler_extension.reference_name
 
             package_kind = None
             missing_kind = None
@@ -86,13 +88,13 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
 
             if args.packages_select_cache_miss:
                 if missing_kind == reference_name:
-                    package_kind = ('missing {reference_name} lockfile'
+                    package_kind = ("missing '{reference_name}' lockfile"
                                     .format_map(locals()))
 
             if missing_kind is None:
                 if reference_lockfile == verb_lockfile:
-                    package_kind = ('matching {reference_name} and '
-                                    '{verb_name} lockfiles'
+                    package_kind = ("matching '{reference_name}' and "
+                                    "'{verb_name}' lockfiles"
                                     .format_map(locals()))
 
             if package_kind is not None:

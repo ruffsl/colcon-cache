@@ -12,6 +12,8 @@ from colcon_cache.event_handler \
     import get_previous_lockfile, set_lockfile
 from colcon_cache.subverb.capture \
     import CaptureCachePackageArguments
+from colcon_cache.verb_handler \
+    import get_verb_handler_extensions
 
 
 class StoreLockfileEventHandler(EventHandlerExtensionPoint):
@@ -39,24 +41,15 @@ class StoreLockfileEventHandler(EventHandlerExtensionPoint):
         elif isinstance(data, JobEnded):
             job = event[1]
 
-            if isinstance(job.task_context.args,
-                          CaptureCachePackageArguments):
-                verb_name = 'cache'
-                lockfile = job.task_context.pkg.metadata['lockfile']
-            elif isinstance(job.task_context.args,
-                            BuildPackageArguments):
-                verb_name = 'build'
-                lockfile = get_previous_lockfile(
-                    job.task_context.args.build_base,
-                    'cache')
-            elif isinstance(job.task_context.args,
-                            TestPackageArguments):
-                verb_name = 'test'
-                lockfile = get_previous_lockfile(
-                    job.task_context.args.build_base,
-                    'build')
+            verb_name = self.context.args.verb_name
+            verb_handler_extensions = get_verb_handler_extensions()
+
+            if verb_name in verb_handler_extensions:
+                verb_handler_extension = verb_handler_extensions[verb_name]
             else:
                 return
+
+            lockfile = verb_handler_extension.get_job_lockfile(job)
 
             if job in self._test_failures:
                 return
