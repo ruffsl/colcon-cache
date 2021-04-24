@@ -154,7 +154,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         implementation_options.add_argument(
             '--dirhash-jobs',
             type=int,
-            default=1,  # TODO make default number of cores?
+            default=-1,  # TODO make default number of cores?
             help='Number of jobs (parallel processes) to use.'
         )
 
@@ -181,6 +181,8 @@ class DirhashCaptureTask(TaskExtensionPoint):
         return 0
 
     def compute_current_checksum(self, args):  # noqa: D102
+
+        if args.dirhash_jobs < 0:
         # Use the number of CPU cores
         jobs = os.cpu_count()
         with suppress(AttributeError):
@@ -189,6 +191,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         if jobs is None:
             # the number of cores can't be determined
             jobs = 1
+            args.dirhash_jobs = jobs
 
         kwargs = vars(args).copy()
         kwargs['dirhash_directory'] = args.path
