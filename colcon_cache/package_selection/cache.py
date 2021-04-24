@@ -78,10 +78,10 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
 
             package_kind = None
             missing_kind = None
-            if verb_lockfile is None:
-                missing_kind = verb_name
             if reference_lockfile is None:
                 missing_kind = reference_name
+            elif verb_lockfile is None:
+                missing_kind = verb_name
 
             if args.packages_select_cache_miss:
                 if missing_kind == reference_name:
