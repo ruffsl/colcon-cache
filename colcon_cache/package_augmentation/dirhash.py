@@ -6,10 +6,10 @@ from colcon_core.package_augmentation import PackageAugmentationExtensionPoint
 from colcon_core.package_augmentation import update_descriptor
 from colcon_core.plugin_system import satisfies_version
 
-VCS_TYPE = 'default'
+VCS_TYPE = 'dirhash'
 
 
-class DefaultPackageAugmentation(PackageAugmentationExtensionPoint):
+class DirhashPackageAugmentation(PackageAugmentationExtensionPoint):
     """Augment packages using no version control system."""
 
     def __init__(self):  # noqa: D107
