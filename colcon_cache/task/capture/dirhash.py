@@ -15,6 +15,7 @@ import dirhash
 logger = colcon_logger.getChild(__name__)
 
 ENTRY_TYPE = 'dirhash'
+META_ARGS = ['dirhash_ratchet', 'dirhash_reset']
 
 
 class DirhashCaptureTask(TaskExtensionPoint):
@@ -25,6 +26,14 @@ class DirhashCaptureTask(TaskExtensionPoint):
         satisfies_version(TaskExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
 
     def add_arguments(self, *, parser):  # noqa: D102
+        modifier_group = parser.add_mutually_exclusive_group()
+        modifier_group.add_argument(
+            '--dirhash-ratchet', action='store_true',
+            help='Ratchet refrence checksum from previous value')
+        modifier_group.add_argument(
+            '--dirhash-reset', action='store_true',
+            help='Reset refrence checksum to current value')
+
         parser.add_argument(
             '--dirhash-algorithm',
             choices=dirhash.algorithms_available,
@@ -173,8 +182,17 @@ class DirhashCaptureTask(TaskExtensionPoint):
         capture_cache = CacheLockfile(capture_cache_path)
 
         entry_data = capture_cache.get_entry(ENTRY_TYPE)
-        entry_data['reference_checksum'] = entry_data['current_checksum']
-        entry_data['current_checksum'] = self.compute_current_checksum(args)
+
+        if args.dirhash_ratchet:
+            entry_data['reference_checksum'] = \
+                entry_data['current_checksum']
+
+        if args.dirhash_reset:
+            entry_data['reference_checksum'] = \
+                self.compute_current_checksum(args)
+
+        entry_data['current_checksum'] = \
+            self.compute_current_checksum(args)
         capture_cache.set_entry(ENTRY_TYPE, entry_data)
         pkg.metadata['lockfile'] = capture_cache
 
@@ -195,6 +213,8 @@ class DirhashCaptureTask(TaskExtensionPoint):
 
         kwargs = vars(args).copy()
         kwargs['dirhash_directory'] = args.path
+        for k in META_ARGS:
+            kwargs.pop(k)
 
         for key in list(kwargs.keys()):
             if key.startswith('dirhash_'):
