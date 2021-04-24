@@ -60,6 +60,9 @@ class DirhashCaptureTask(TaskExtensionPoint):
                 'https://github.com/andhus/dirhash/README.md#filtering'
             )
         )
+        # FIXME: Find out how colcon help could display group description
+        filter_options = parser
+
         filter_options.add_argument(
             '--dirhash-match',
             nargs='+',
@@ -111,6 +114,8 @@ class DirhashCaptureTask(TaskExtensionPoint):
                 'https://github.com/andhus/dirhash/DIRHASH_STANDARD.md#protocol'
             )
         )
+        # FIXME: Find out how colcon help could display group description
+        protocol_options = parser
         protocol_options.add_argument(
             '--dirhash-properties',
             nargs='+',
@@ -138,6 +143,8 @@ class DirhashCaptureTask(TaskExtensionPoint):
             title='Implementation options',
             description=''
         )
+        # FIXME: Find out how colcon help could display group description
+        implementation_options = parser
         implementation_options.add_argument(
             '--dirhash-chunk-size',
             default=2**20,
