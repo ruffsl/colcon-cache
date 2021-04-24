@@ -4,10 +4,10 @@
 
 from pathlib import Path
 
+from colcon_cache.cache import CacheLockfile
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
-from colcon_cache.cache import CacheLockfile
 from git import Repo
 
 logger = colcon_logger.getChild(__name__)
@@ -42,7 +42,7 @@ class GitCaptureTask(TaskExtensionPoint):
         capture_cache.set_entry(ENTRY_TYPE, entry_data)
         pkg.metadata['lockfile'] = capture_cache
 
-        return '0'
+        return 0
 
     def compute_current_checksum(self, args):  # noqa: D102
         repo = Repo(args.path, search_parent_directories=True)

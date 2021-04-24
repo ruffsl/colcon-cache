@@ -2,11 +2,11 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+from colcon_cache.subverb import CacheSubverbExtensionPoint
 from colcon_core.package_selection import add_arguments \
     as add_packages_arguments
 from colcon_core.package_selection import get_package_descriptors
 from colcon_core.plugin_system import satisfies_version
-from colcon_cache.subverb import CacheSubverbExtensionPoint
 
 
 class CaptureCacheSubverb(CacheSubverbExtensionPoint):
