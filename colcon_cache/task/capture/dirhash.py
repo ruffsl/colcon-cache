@@ -70,18 +70,18 @@ class DirhashCaptureTask(TaskExtensionPoint):
             help=(
                 'One or several patterns for paths to include. NOTE: patterns '
                 'with an asterisk must be in quotes ("*") or the asterisk '
-                'preceded by an escape character (\*).'
+                'preceded by an escape character (\\*).'
             ),
             metavar=''
         )
         filter_options.add_argument(
             '--dirhash-ignore',
             nargs='+',
-            default=None,
+            default=['.*'],
             help=(
                 'One or several patterns for paths to exclude. NOTE: patterns '
                 'with an asterisk must be in quotes ("*") or the asterisk '
-                'preceded by an escape character (\*).'
+                'preceded by an escape character (\\*).'
             ),
             metavar=''
         )
@@ -183,14 +183,14 @@ class DirhashCaptureTask(TaskExtensionPoint):
     def compute_current_checksum(self, args):  # noqa: D102
 
         if args.dirhash_jobs < 0:
-        # Use the number of CPU cores
-        jobs = os.cpu_count()
-        with suppress(AttributeError):
-            # consider restricted set of CPUs if applicable
-            jobs = min(jobs, len(os.sched_getaffinity(0)))
-        if jobs is None:
-            # the number of cores can't be determined
-            jobs = 1
+            # Use the number of CPU cores
+            jobs = os.cpu_count()
+            with suppress(AttributeError):
+                # consider restricted set of CPUs if applicable
+                jobs = min(jobs, len(os.sched_getaffinity(0)))
+            if jobs is None:
+                # the number of cores can't be determined
+                jobs = 1
             args.dirhash_jobs = jobs
 
         kwargs = vars(args).copy()
