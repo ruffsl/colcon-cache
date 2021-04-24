@@ -26,15 +26,6 @@ class DirhashCaptureTask(TaskExtensionPoint):
 
     def add_arguments(self, *, parser):  # noqa: D102
         parser.add_argument(
-            '-v', '--version',
-            action='version',
-            version='dirhash {}'.format(dirhash.__version__)
-        )
-        parser.add_argument(
-            'directory',
-            help='Directory to hash.'
-        )
-        parser.add_argument(
             '-a', '--algorithm',
             choices=dirhash.algorithms_available,
             default='md5',
@@ -159,16 +150,6 @@ class DirhashCaptureTask(TaskExtensionPoint):
             default=1,  # TODO make default number of cores?
             help='Number of jobs (parallel processes) to use.'
         )
-
-        special_options = parser.add_argument_group(title='Special options')
-        special_options.add_argument(
-            '-l', '--list',
-            action='store_true',
-            default=False,
-            help='List the file paths that will be taken into account, given the '
-                'provided filtering options.'
-        )
-
 
     async def capture(self, *, additional_hooks=None):  # noqa: D102
         pkg = self.context.pkg
