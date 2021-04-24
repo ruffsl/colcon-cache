@@ -41,17 +41,31 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
         )):
             return
 
+        if args.packages_select_cache_miss:
+            argument = '--packages-select-cache-miss'
+        elif args.packages_skip_cache_hit:
+            argument = '--packages-skip-cache-hit'
+        else:
+            assert False
+
         if not hasattr(args, 'build_base'):
-            if args.packages_select_cache_miss:
-                argument = '--packages-select-cache-miss'
-            elif args.packages_skip_cache_hit:
-                argument = '--packages-skip-cache-hit'
-            else:
-                assert False
             logger.warning(
                 "Ignoring '{argument}' since the invoked verb doesn't have a "
                 "'--build-base' argument and therefore can't access "
                 'information about the previous state of a package'
+                .format_map(locals()))
+            return
+
+        verb_name = args.verb_name
+        verb_handler_extensions = get_verb_handler_extensions()
+
+        if verb_name in verb_handler_extensions:
+            verb_handler_extension = verb_handler_extensions[verb_name]
+        else:
+            logger.warning(
+                "Ignoring '{argument}' since the invoked verb doesn't have a "
+                "colcon cache verb handler extention and therefore can't "
+                'access information about the previous state of a package'
                 .format_map(locals()))
             return
 
@@ -61,14 +75,6 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
                 continue
 
             pkg = decorator.descriptor
-
-            verb_name = args.verb_name
-            verb_handler_extensions = get_verb_handler_extensions()
-
-            if verb_name in verb_handler_extensions:
-                verb_handler_extension = verb_handler_extensions[verb_name]
-            else:
-                assert False
 
             package_build_base = os.path.join(
                 args.build_base, pkg.name)
