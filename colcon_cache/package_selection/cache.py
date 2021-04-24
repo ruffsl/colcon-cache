@@ -42,9 +42,9 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             return
 
         if not hasattr(args, 'build_base'):
-            if args.packages_select_build_cache_miss:
+            if args.packages_select_cache_miss:
                 argument = '--packages-select-cache-miss'
-            elif args.packages_skip_build_cache_hit:
+            elif args.packages_skip_cache_hit:
                 argument = '--packages-skip-cache-hit'
             else:
                 assert False
