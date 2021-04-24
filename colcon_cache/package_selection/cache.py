@@ -59,10 +59,10 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
 
             pkg = decorator.descriptor
 
-            # dargs = vars(args.subverb_name)
-            verb_name = args.subverb_name
-
-            if verb_name == 'build':
+            verb_name = args.verb_name
+            if verb_name == 'cache':
+                reference_name = None
+            elif verb_name == 'build':
                 reference_name = 'cache'
             elif verb_name == 'test':
                 reference_name = 'build'
