@@ -52,6 +52,6 @@ class StoreLockfileEventHandler(EventHandlerExtensionPoint):
             if str(data.rc) != '0':
                 return
 
-            if lockfile is not None:
+            if lockfile:
                 set_lockfile(
                     job.task_context.args.build_base, verb_name, lockfile)
