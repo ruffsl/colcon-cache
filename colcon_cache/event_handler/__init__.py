@@ -19,7 +19,8 @@ def get_previous_lockfile(package_build_base, verb_name):
     if not path.exists():
         return None
     lockfile = CacheLockfile()
-    return lockfile.load(path)
+    lockfile.load(path)
+    return lockfile
 
 
 def set_lockfile(package_build_base, verb_name, lockfile):
