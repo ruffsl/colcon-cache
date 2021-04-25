@@ -24,4 +24,4 @@ class CacheVerbHandler(VerbHandlerExtensionPoint):
         return None
 
     def get_job_lockfile(self, job):  # noqa: D102
-        return job.task_context.pkg.metadata['lockfile']
+        return None

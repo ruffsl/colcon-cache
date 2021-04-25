@@ -6,7 +6,8 @@ import hashlib
 from pathlib import Path
 
 from colcon_cache.cache import CacheLockfile
-from colcon_cache.event_handler import get_previous_lockfile
+from colcon_cache.event_handler \
+    import get_previous_lockfile, set_lockfile
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
@@ -80,6 +81,7 @@ class GitCaptureTask(TaskExtensionPoint):
             self.compute_current_checksums(args)
 
         pkg.metadata['lockfile'] = lockfile
+        set_lockfile(args.build_base, 'cache', lockfile)
 
         return 0
 
