@@ -17,7 +17,6 @@ hexdigest
 hexsha
 https
 iterdir
-lockdata
 lockfile
 lockfiles
 nargs

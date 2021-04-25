@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 
 from colcon_cache.cache import CacheLockfile
+from colcon_cache.event_handler import get_previous_lockfile
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
@@ -178,24 +179,22 @@ class DirhashCaptureTask(TaskExtensionPoint):
 
         cache_base = Path(args.build_base, 'cache')
         cache_base.mkdir(parents=True, exist_ok=True)
-        capture_cache_path = Path(
-            cache_base, 'colcon_cache.yaml')
-        capture_cache = CacheLockfile(capture_cache_path)
-
-        entry_data = capture_cache.get_entry(ENTRY_TYPE)
+        lockfile = get_previous_lockfile(args.build_base, 'cache')
+        if lockfile is None:
+            lockfile = CacheLockfile(lock_type=ENTRY_TYPE)
+        assert lockfile.lock_type == ENTRY_TYPE
 
         if args.dirhash_ratchet:
-            entry_data['reference_checksum'] = \
-                entry_data['current_checksum']
+            lockfile.checksums.reference = \
+                lockfile.checksums.current
+
+        current_checksum = self.compute_current_checksum(args)
+        lockfile.checksums.current = current_checksum
 
         if args.dirhash_reset:
-            entry_data['reference_checksum'] = \
-                self.compute_current_checksum(args)
+            lockfile.checksums.reference = current_checksum
 
-        entry_data['current_checksum'] = \
-            self.compute_current_checksum(args)
-        capture_cache.set_entry(ENTRY_TYPE, entry_data)
-        pkg.metadata['lockfile'] = capture_cache
+        pkg.metadata['lockfile'] = lockfile
 
         return 0
 
