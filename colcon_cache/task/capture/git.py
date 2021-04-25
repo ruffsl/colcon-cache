@@ -95,7 +95,7 @@ class GitCaptureTask(TaskExtensionPoint):
         diff_args.append('--diff-filter={}'.format(args.git_diff_filter))
         diff_args.append(reference_commit.hexsha)
         diff_args.append(args.path)
-        diff = repo.git.diff_index(diff_args)
+        diff = repo.git.diff(diff_args)
 
         if not diff:
             return reference_commit.hexsha, reference_commit.hexsha
