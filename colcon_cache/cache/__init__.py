@@ -14,10 +14,10 @@ LOCKFILE_VERSION = '0.0.1'
 class CacheChecksums:
     """Cache checksums for package."""
 
-    def __init__(
+    def __init__(  # noqa: D107
             self,
             current=None,
-            reference=None):  # noqa: D107
+            reference=None):
         self.current = current
         self.reference = reference
 
@@ -33,12 +33,12 @@ class CacheChecksums:
 class CacheLockfile:
     """Cache lockfile for package."""
 
-    def __init__(
+    def __init__(  # noqa: D107
             self,
             lock_type=None,
             checksums=None,
             dependencies=None,
-            metadata=None):  # noqa: D107
+            metadata=None):
         self.version = LOCKFILE_VERSION
         self.lock_type = lock_type
 
