@@ -3,8 +3,10 @@
 # Licensed under the Apache License, Version 2.0
 
 import hashlib
+from pathlib import Path
 
-from colcon_cache.cache import CacheLockfile, get_lockfile_path
+from colcon_cache.cache import CacheLockfile
+from colcon_cache.event_handler import get_previous_lockfile
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
@@ -62,20 +64,20 @@ class GitCaptureTask(TaskExtensionPoint):
             "Capturing git cache of package in '{args.path}'"
             .format_map(locals()))
 
-        # Get current lockfile
-        lockfile_path = get_lockfile_path(args.build_base, 'cache')
-        lockfile = CacheLockfile(lockfile_path)
-        entry_data = lockfile.get_entry(ENTRY_TYPE)
+        cache_base = Path(args.build_base, 'cache')
+        cache_base.mkdir(parents=True, exist_ok=True)
+        lockfile = get_previous_lockfile(args.build_base, 'cache')
+        if lockfile is None:
+            lockfile = CacheLockfile(lock_type=ENTRY_TYPE)
 
         if args.git_reference_revision is None:
             args.git_reference_revision = \
-                entry_data['reference_checksum']
+                lockfile.checksums.reference
 
-        entry_data['reference_checksum'], \
-            entry_data['current_checksum'] = \
+        lockfile.checksums.reference, \
+            lockfile.checksums.current = \
             self.compute_current_checksums(args)
 
-        lockfile.set_entry(ENTRY_TYPE, entry_data)
         pkg.metadata['lockfile'] = lockfile
 
         return 0

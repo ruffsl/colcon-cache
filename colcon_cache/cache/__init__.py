@@ -1,62 +1,90 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+import json
 import pathlib
 
+from colcon_core.plugin_system import satisfies_version
 import yaml
 
 LOCKFILE_FILENAME = 'colcon_{verb_name}.yaml'
+LOCKFILE_VERSION = '0.0.1'
+
+
+class CacheChecksums:
+    """Cache checksums for package."""
+
+    def __init__(
+            self,
+            current=None,
+            reference=None):  # noqa: D107
+        self.current = current
+        self.reference = reference
+
+    def __eq__(self, other):  # noqa: D105
+        if not isinstance(other, CacheChecksums):
+            return False
+        return self.current == other.current
+
+    def is_changed(self):  # noqa: D10s
+        return self.current != self.reference
 
 
 class CacheLockfile:
-    """Capture current cache for packages."""
+    """Cache lockfile for package."""
 
-    def __init__(self, path):  # noqa: D107
-        if path.exists():
-            lockdata = path.read_text()
-            lockdata = yaml.safe_load(lockdata)
+    def __init__(
+            self,
+            lock_type=None,
+            checksums=None,
+            dependencies=None,
+            metadata=None):  # noqa: D107
+        self.version = LOCKFILE_VERSION
+        self.lock_type = lock_type
+
+        if checksums:
+            assert(isinstance(checksums, CacheChecksums))
+            self.checksums = checksums
         else:
-            lockdata = {'entry': {}}
+            self.checksums = CacheChecksums()
 
-        self._lockdata = lockdata
-        self._path = path
+        if dependencies:
+            assert(isinstance(dependencies, dict))
+            self.dependencies = dependencies
+        else:
+            self.dependencies = {}
+
+        if metadata:
+            assert(isinstance(metadata, dict))
+            self.metadata = metadata
+        else:
+            self.metadata = {}
 
     def __eq__(self, other):  # noqa: D105
         if not isinstance(other, CacheLockfile):
             return False
-        # only ensure other at least includes all of self
-        for entry_key, self_value in self._lockdata['entry'].items():
-            if entry_key in other._lockdata['entry']:
-                other_value = other._lockdata['entry'][entry_key]
-                if (self_value['current_checksum'] !=
-                        other_value['current_checksum']):
-                    return False
-            else:
-                return False
-        return True
+        return self.checksums == other.checksums
 
     def is_changed(self):  # noqa: D10s
-        # only ensure other at least includes all of self
-        for _, entry_value in self._lockdata['entry'].items():
-            if (entry_value['current_checksum'] !=
-                    entry_value['reference_checksum']):
-                return True
-        return False
+        return self.checksums.is_changed()
 
-    def get_entry(self, entry_type):  # noqa: D102
-        if entry_type in self._lockdata['entry']:
-            return self._lockdata['entry'][entry_type]
-        else:
-            return {'current_checksum': None,
-                    'reference_checksum': None}
+    def load(self, path):  # noqa: D102
+        content = path.read_text()
+        data = yaml.safe_load(content)
+        satisfies_version(data['version'], '^0.0.1')
 
-    def set_entry(self, entry_type, entry_data):  # noqa: D102
-        self._lockdata['entry'][entry_type] = entry_data
+        self.lock_type = data['lock_type']
+        self.checksums = CacheChecksums(**data['checksums'])
+        if data['dependencies']:
+            self.dependencies = data['dependencies']
+        if data['metadata']:
+            self.metadata = data['metadata']
 
-    def dump(self, path=None):  # noqa: D102
-        if path is None:
-            path = self._path
-        path.write_text(yaml.dump(self._lockdata, sort_keys=True))
+    def dump(self, path):  # noqa: D102
+        data = json.loads(
+            json.dumps(self, default=lambda o: o.__dict__))
+        path.write_text(
+            yaml.dump(data, sort_keys=True))
 
 
 def get_lockfile_path(package_build_base, verb_name):
