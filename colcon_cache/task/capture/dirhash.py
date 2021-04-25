@@ -104,13 +104,13 @@ class DirhashCaptureTask(TaskExtensionPoint):
         )
         filter_options.add_argument(
             '--dirhash-no-linked-dirs',
-            dest='linked_dirs',
+            dest='dirhash_linked_dirs',
             action='store_false',
             help='Do not include symbolic links to other directories.'
         )
         filter_options.add_argument(
             '--dirhash-no-linked-files',
-            dest='linked_files',
+            dest='dirhash_linked_files',
             action='store_false',
             help='Do not include symbolic links to files.'
         )
@@ -129,7 +129,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         protocol_options.add_argument(
             '--dirhash-properties',
             nargs='+',
-            dest='entry_properties',
+            dest='dirhash_entry_properties',
             default=['data', 'name'],
             help=(
                 'List of file/directory properties to include in the hash. Available '
