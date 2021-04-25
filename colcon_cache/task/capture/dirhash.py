@@ -182,6 +182,7 @@ class DirhashCaptureTask(TaskExtensionPoint):
         lockfile = get_previous_lockfile(args.build_base, 'cache')
         if lockfile is None:
             lockfile = CacheLockfile(lock_type=ENTRY_TYPE)
+        assert lockfile.lock_type == ENTRY_TYPE
 
         if args.dirhash_ratchet:
             lockfile.checksums.reference = \

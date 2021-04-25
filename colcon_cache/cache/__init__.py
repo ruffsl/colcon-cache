@@ -63,6 +63,8 @@ class CacheLockfile:
     def __eq__(self, other):  # noqa: D105
         if not isinstance(other, CacheLockfile):
             return False
+        elif self.lock_type != other.lock_type:
+            return False
         return self.checksums == other.checksums
 
     def is_changed(self):  # noqa: D10s

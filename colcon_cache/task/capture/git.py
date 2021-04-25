@@ -69,6 +69,7 @@ class GitCaptureTask(TaskExtensionPoint):
         lockfile = get_previous_lockfile(args.build_base, 'cache')
         if lockfile is None:
             lockfile = CacheLockfile(lock_type=ENTRY_TYPE)
+        assert lockfile.lock_type == ENTRY_TYPE
 
         if args.git_reference_revision is None:
             args.git_reference_revision = \
