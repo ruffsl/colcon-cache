@@ -46,6 +46,7 @@ class CaptureCachePackageArguments:
             os.path.join(os.getcwd(), str(pkg.path)))
         self.build_base = os.path.abspath(os.path.join(
             os.getcwd(), args.build_base, pkg.name))
+        self.ignore_dependencies = args.ignore_dependencies
 
         # set additional arguments
         for dest in (additional_destinations or []):
@@ -74,6 +75,12 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
             '--build-base',
             default='build',
             help='The base path for all build directories (default: build)')
+
+        parser.add_argument(
+            '--ignore-dependencies',
+            action='store_true',
+            help='Ignore dependencies when capturing caches (default: false)')
+
         add_executor_arguments(parser)
         add_event_handler_arguments(parser)
         add_packages_arguments(parser)
@@ -140,6 +147,11 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
                     .format_map(locals()))
                 continue
 
+            recursive_dependencies = OrderedDict()
+            for dep_name in decorator.recursive_dependencies:
+                dep_path = Path(args.build_base) / dep_name
+                recursive_dependencies[dep_name] = dep_path
+
             package_args = CaptureCachePackageArguments(
                 pkg, args, additional_destinations=self
                 .task_argument_destinations.values())
@@ -152,11 +164,11 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
                 '{{{ordered_package_args}}}'.format_map(locals()))
             task_context = TaskContext(
                 pkg=pkg, args=package_args,
-                dependencies=None)
+                dependencies=recursive_dependencies)
 
             job = Job(
                 identifier=pkg.name,
-                dependencies=[],
+                dependencies=set(recursive_dependencies.keys()),
                 task=extension, task_context=task_context)
 
             jobs[pkg.name] = job

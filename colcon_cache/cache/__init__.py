@@ -70,6 +70,13 @@ class CacheLockfile:
     def is_changed(self):  # noqa: D10s
         return self.checksums.is_changed()
 
+    def update_dependencies(self, dep_lockfiles):  # noqa: D10s
+        self.dependencies.clear()
+        for dep_name, dep_lockfile in dep_lockfiles.items():
+            assert isinstance(dep_lockfile, CacheLockfile)
+            self.dependencies[dep_name] = \
+                dep_lockfile.checksums.current
+
     def load(self, path):  # noqa: D102
         content = path.read_text()
         data = yaml.safe_load(content)

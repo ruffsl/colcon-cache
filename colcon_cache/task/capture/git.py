@@ -6,7 +6,9 @@ import hashlib
 from pathlib import Path
 
 from colcon_cache.cache import CacheLockfile
-from colcon_cache.event_handler import get_previous_lockfile
+from colcon_cache.event_handler \
+    import get_previous_lockfile, set_lockfile
+from colcon_cache.task.capture import get_dependencies_lockfiles
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
@@ -71,25 +73,29 @@ class GitCaptureTask(TaskExtensionPoint):
             lockfile = CacheLockfile(lock_type=ENTRY_TYPE)
         assert lockfile.lock_type == ENTRY_TYPE
 
+        dep_lockfiles = \
+            get_dependencies_lockfiles(args, self.context.dependencies)
+        lockfile.update_dependencies(dep_lockfiles)
+
         if args.git_reference_revision is None:
             args.git_reference_revision = \
-                lockfile.checksums.reference
+                lockfile.metadata.get('reference_revision', None)
 
-        lockfile.checksums.reference, \
-            lockfile.checksums.current = \
-            self.compute_current_checksums(args)
+        self.compute_current_checksums(args, lockfile)
 
         pkg.metadata['lockfile'] = lockfile
+        set_lockfile(args.build_base, 'cache', lockfile)
 
         return 0
 
-    def compute_current_checksums(self, args):  # noqa: D102
+    def compute_current_checksums(self, args, lockfile):  # noqa: D102
         repo = Repo(args.path, search_parent_directories=True)
 
         if args.git_reference_revision is None:
             reference_commit = repo.commit()
         else:
             reference_commit = repo.commit(args.git_reference_revision)
+        lockfile.metadata['reference_revision'] = reference_commit.hexsha
 
         diff_args = []
         diff_args.append('--diff-filter={}'.format(args.git_diff_filter))
@@ -97,10 +103,13 @@ class GitCaptureTask(TaskExtensionPoint):
         diff_args.append(args.path)
         diff = repo.git.diff(diff_args)
 
-        if not diff:
-            return reference_commit.hexsha, reference_commit.hexsha
-
         h = hashlib.sha1()
+        for _, checksum in lockfile.dependencies.items():
+            h.update(bytes.fromhex(checksum))
+
         h.update(bytes.fromhex(reference_commit.hexsha))
-        h.update(diff.encode('utf-8'))
-        return reference_commit.hexsha, h.hexdigest()
+        lockfile.checksums.reference = h.hexdigest()
+
+        if diff:
+            h.update(diff.encode('utf-8'))
+        lockfile.checksums.current = h.hexdigest()
