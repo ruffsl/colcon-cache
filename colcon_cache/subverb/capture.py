@@ -140,6 +140,11 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
                     .format_map(locals()))
                 continue
 
+            recursive_dependencies = OrderedDict()
+            for dep_name in decorator.recursive_dependencies:
+                dep_path = Path(args.build_base) / dep_name
+                recursive_dependencies[dep_name] = dep_path
+
             package_args = CaptureCachePackageArguments(
                 pkg, args, additional_destinations=self
                 .task_argument_destinations.values())
@@ -152,11 +157,11 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
                 '{{{ordered_package_args}}}'.format_map(locals()))
             task_context = TaskContext(
                 pkg=pkg, args=package_args,
-                dependencies=None)
+                dependencies=recursive_dependencies)
 
             job = Job(
                 identifier=pkg.name,
-                dependencies=[],
+                dependencies=set(recursive_dependencies.keys()),
                 task=extension, task_context=task_context)
 
             jobs[pkg.name] = job
