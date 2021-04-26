@@ -1,4 +1,3 @@
-# flake8: noqa
 # Copyright 2016-2018 Dirk Thomas
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
@@ -43,36 +42,35 @@ class DirhashCaptureTask(TaskExtensionPoint):
             '--dirhash-algorithm',
             choices=dirhash.algorithms_available,
             default='md5',
-            help=(
-                'Hashing algorithm to use, by default "md5". Always available: {}. '
-                'Additionally available on current platform: {}. Note that the same '
-                'algorithm may appear multiple times in this set under different names '
-                '(thanks to OpenSSL) '
-                '[https://docs.python.org/2/library/hashlib.html]'.format(
-                    sorted(dirhash.algorithms_guaranteed),
-                    sorted(dirhash.algorithms_available - dirhash.algorithms_guaranteed)
-                )
-            ),
+            help='Hashing algorithm to use, by default "md5". Always '
+            'available: {}. Additionally available on current platform: {}. '
+            'Note that the same algorithm may appear multiple times in this '
+            'set under different names (thanks to OpenSSL) '
+            '[https://docs.python.org/2/library/hashlib.html]'.format(
+                sorted(dirhash.algorithms_guaranteed),
+                sorted(dirhash.algorithms_available -
+                       dirhash.algorithms_guaranteed)
+                ),
             metavar=''
         )
 
         filter_options = parser.add_argument_group(
             title='Filtering options',
-            description=(
-                'Specify what files and directories to include. All files and '
-                'directories (including symbolic links) are included by default. The '
-                '--dirhash-match/--dirhash-ignore arguments allows for selection using glob/wildcard '
-                '(".gitignore style") path matching. Paths relative to the root '
-                '`directory` (i.e. excluding the name of the root directory itself) are '
-                'matched against the provided patterns. For example, to only include '
-                'python source files, use: `dirhash path/to/dir -m "*.py"` or to '
-                'exclude hidden files and directories use: '
-                '`dirhash path/to.dir -i ".*" ".*/"` which is short for '
-                '`dirhash path/to.dir -m "*" "!.*" "!.*/"`. By adding the --dirhash-list '
-                'argument, all included paths, for the given filtering arguments, are '
-                'returned instead of the hash value. For further details see '
-                'https://github.com/andhus/dirhash/README.md#filtering'
-            )
+            description='Specify what files and directories to include. All '
+            'files and directories (including symbolic links) are included '
+            'by default. The --dirhash-match/--dirhash-ignore arguments '
+            'allows for selection using glob/wildcard (".gitignore style") '
+            'path matching. Paths relative to the root `directory` (i.e. '
+            'excluding the name of the root directory itself) are matched '
+            'against the provided patterns. For example, to only include '
+            'python source files, use: `dirhash path/to/dir -m "*.py"` or to '
+            'exclude hidden files and directories use: '
+            '`dirhash path/to.dir -i ".*" ".*/"` which is short for '
+            '`dirhash path/to.dir -m "*" "!.*" "!.*/"`. By adding the '
+            '--dirhash-list argument, all included paths, for the given '
+            'filtering arguments, are returned instead of the hash value. '
+            'For further details see '
+            'https://github.com/andhus/dirhash/README.md#filtering'
         )
         # FIXME: Find out how colcon help could display group description
         filter_options = parser
@@ -81,30 +79,26 @@ class DirhashCaptureTask(TaskExtensionPoint):
             '--dirhash-match',
             nargs='+',
             default=['*'],
-            help=(
-                'One or several patterns for paths to include. NOTE: patterns '
-                'with an asterisk must be in quotes ("*") or the asterisk '
-                'preceded by an escape character (\\*).'
-            ),
+            help='One or several patterns for paths to include. NOTE: '
+            'patterns with an asterisk must be in quotes ("*") or the '
+            'asterisk preceded by an escape character (\\*).',
             metavar=''
         )
         filter_options.add_argument(
             '--dirhash-ignore',
             nargs='+',
             default=['.*'],
-            help=(
-                'One or several patterns for paths to exclude. NOTE: patterns '
-                'with an asterisk must be in quotes ("*") or the asterisk '
-                'preceded by an escape character (\\*).'
-            ),
+            help='One or several patterns for paths to exclude. NOTE: '
+            'patterns with an asterisk must be in quotes ("*") or the '
+            'asterisk preceded by an escape character (\\*).',
             metavar=''
         )
         filter_options.add_argument(
             '--dirhash-empty-dirs',
             action='store_true',
             default=False,
-            help='Include empty directories (containing no files that meet the matching '
-                 'criteria and no non-empty sub directories).'
+            help='Include empty directories (containing no files that meet '
+            'the matching criteria and no non-empty sub directories).'
         )
         filter_options.add_argument(
             '--dirhash-no-linked-dirs',
@@ -122,11 +116,9 @@ class DirhashCaptureTask(TaskExtensionPoint):
 
         protocol_options = parser.add_argument_group(
             title='Protocol options',
-            description=(
-                'Specify what properties of files and directories to include and '
-                'whether to allow cyclic links. For further details see '
-                'https://github.com/andhus/dirhash/DIRHASH_STANDARD.md#protocol'
-            )
+            description='Specify what properties of files and directories to '
+            'include and to allow cyclic links. For further details see '
+            'https://github.com/andhus/dirhash/DIRHASH_STANDARD.md#protocol'
         )
         # FIXME: Find out how colcon help could display group description
         protocol_options = parser
@@ -135,22 +127,20 @@ class DirhashCaptureTask(TaskExtensionPoint):
             nargs='+',
             dest='dirhash_entry_properties',
             default=['data', 'name'],
-            help=(
-                'List of file/directory properties to include in the hash. Available '
-                'properties are: {} and at least one of name and data must be '
-                'included. Default is [data name] which means that both the name/paths'
-                ' and content (actual data) of files and directories will be included'
-            ).format(list(dirhash.Protocol.EntryProperties.options)),
+            help='List of file/directory properties to include in the hash. '
+            'Available properties are: {} and at least one of name and data '
+            'must be included. Default is [data name] which means that both '
+            'the name/paths and content (actual data) of files and '
+            'directories will be included.'.format(
+                list(dirhash.Protocol.EntryProperties.options)),
             metavar=''
         )
         protocol_options.add_argument(
             '--dirhash-allow-cyclic-links',
             default=False,
             action='store_true',
-            help=(
-                'Allow presence of cyclic links (by hashing the relative path to the '
-                'target directory).'
-            )
+            help='Allow presence of cyclic links (by hashing the relative '
+            'path to the target directory).'
         )
 
         implementation_options = parser.add_argument_group(
