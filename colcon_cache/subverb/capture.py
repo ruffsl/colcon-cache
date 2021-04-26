@@ -46,6 +46,7 @@ class CaptureCachePackageArguments:
             os.path.join(os.getcwd(), str(pkg.path)))
         self.build_base = os.path.abspath(os.path.join(
             os.getcwd(), args.build_base, pkg.name))
+        self.ignore_dependencies = args.ignore_dependencies
 
         # set additional arguments
         for dest in (additional_destinations or []):
@@ -74,6 +75,12 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
             '--build-base',
             default='build',
             help='The base path for all build directories (default: build)')
+
+        parser.add_argument(
+            '--ignore-dependencies',
+            action='store_true',
+            help='Ignore dependencies when capturing caches (default: false)')
+
         add_executor_arguments(parser)
         add_event_handler_arguments(parser)
         add_packages_arguments(parser)

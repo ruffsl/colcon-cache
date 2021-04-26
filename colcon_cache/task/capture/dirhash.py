@@ -4,12 +4,14 @@
 # Licensed under the Apache License, Version 2.0
 
 from contextlib import suppress
+import hashlib
 import os
 from pathlib import Path
 
 from colcon_cache.cache import CacheLockfile
 from colcon_cache.event_handler \
     import get_previous_lockfile, set_lockfile
+from colcon_cache.task.capture import get_dependencies_lockfiles
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
@@ -185,22 +187,26 @@ class DirhashCaptureTask(TaskExtensionPoint):
             lockfile = CacheLockfile(lock_type=ENTRY_TYPE)
         assert lockfile.lock_type == ENTRY_TYPE
 
+        dep_lockfiles = \
+            get_dependencies_lockfiles(args, self.context.dependencies)
+        lockfile.update_dependencies(dep_lockfiles)
+
         if args.dirhash_ratchet:
             lockfile.checksums.reference = \
                 lockfile.checksums.current
 
-        current_checksum = self.compute_current_checksum(args)
-        lockfile.checksums.current = current_checksum
+        self.compute_current_checksum(args, lockfile)
 
         if args.dirhash_reset:
-            lockfile.checksums.reference = current_checksum
+            lockfile.checksums.reference = \
+                lockfile.checksums.current
 
         pkg.metadata['lockfile'] = lockfile
         set_lockfile(args.build_base, 'cache', lockfile)
 
         return 0
 
-    def compute_current_checksum(self, args):  # noqa: D102
+    def compute_current_checksum(self, args, lockfile):  # noqa: D102
 
         if args.dirhash_jobs < 0:
             # Use the number of CPU cores
@@ -223,4 +229,11 @@ class DirhashCaptureTask(TaskExtensionPoint):
                 kwargs[key[len('dirhash_'):]] = kwargs.pop(key)
             else:
                 kwargs.pop(key)
-        return dirhash.dirhash(**kwargs)
+        dir_hash = dirhash.dirhash(**kwargs)
+
+        h = hashlib.md5()
+        for _, checksum in lockfile.dependencies.items():
+            h.update(bytes.fromhex(checksum))
+
+        h.update(bytes.fromhex(dir_hash))
+        lockfile.checksums.current = h.hexdigest()
