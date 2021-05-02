@@ -1,6 +1,7 @@
 acdmr
 andhus
 apache
+basepath
 checksum
 checksums
 colcon
@@ -32,6 +33,7 @@ subparser
 subparsers
 subverb
 symlink
+tempfile
 thomas
 todo
 unmerged
