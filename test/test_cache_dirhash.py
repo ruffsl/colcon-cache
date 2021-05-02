@@ -1,4 +1,5 @@
 # Copyright 2019 Rover Robotics
+# Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
 import asyncio
@@ -7,6 +8,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 
+from colcon_cache.subverb.capture import \
+    CaptureCachePackageArguments
+from colcon_cache.task.capture.dirhash import DirhashCaptureTask
 from colcon_core.package_descriptor import PackageDescriptor
 from colcon_core.plugin_system import SkipExtensionException
 import colcon_core.shell
@@ -14,7 +18,6 @@ from colcon_core.shell.bat import BatShell
 from colcon_core.shell.sh import ShShell
 from colcon_core.subprocess import new_event_loop
 from colcon_core.task import TaskContext
-from colcon_core.task.python.build import PythonBuildTask
 import pytest
 
 
@@ -45,30 +48,47 @@ def monkey_patch_put_event_into_queue(monkeypatch):
     )
 
 
-def test_build_package():
+def test_cache_package():
     event_loop = new_event_loop()
     asyncio.set_event_loop(event_loop)
     try:
         with TemporaryDirectory(prefix='test_colcon_') as tmp_path_str:
             tmp_path = Path(tmp_path_str)
-            python_build_task = PythonBuildTask()
+            dirhash_capture_task = DirhashCaptureTask()
             package = PackageDescriptor(tmp_path / 'src')
             package.name = 'test_package'
             package.type = 'python'
 
-            context = TaskContext(
-                pkg=package,
-                args=SimpleNamespace(
+            additional_destinations = [
+                'dirhash_algorithm',
+                'dirhash_match',
+                'dirhash_ignore',
+                'dirhash_empty_dirs',
+                'dirhash_linked_dirs',
+                'dirhash_linked_files',
+                'dirhash_entry_properties',
+                'dirhash_allow_cyclic_links',
+                'dirhash_chunk_size',
+                'dirhash_jobs',
+                'dirhash_ratchet',
+                'dirhash_reset',
+                'git_diff_filter',
+                'git_reference_revision']
+            args = SimpleNamespace(
                     path=str(tmp_path / 'src'),
                     build_base=str(tmp_path / 'build'),
-                    install_base=str(tmp_path / 'install'),
-                    symlink_install=False,
-                ),
+                    ignore_dependencies=False,
+                )
+            package_args = CaptureCachePackageArguments(
+                package, args, additional_destinations=additional_destinations)
+
+            context = TaskContext(
+                pkg=package,
+                args=package_args,
                 dependencies={}
             )
-            python_build_task.set_context(context=context)
-
-            pkg = python_build_task.context.pkg
+            dirhash_capture_task.set_context(context=context)
+            pkg = dirhash_capture_task.context.pkg
 
             pkg.path.mkdir()
             (pkg.path / 'setup.py').write_text(
@@ -81,21 +101,11 @@ def test_build_package():
             (pkg.path / 'my_module').mkdir()
             (pkg.path / 'my_module' / '__init__.py').touch()
 
-            src_base = Path(python_build_task.context.args.path)
-
-            source_files_before = set(src_base.rglob('*'))
-            rc = event_loop.run_until_complete(python_build_task.build())
+            rc = event_loop.run_until_complete(dirhash_capture_task.capture())
             assert not rc
-            source_files_after = set(src_base.rglob('*'))
-            assert source_files_before == source_files_after
 
-            build_base = Path(python_build_task.context.args.build_base)
-            assert 1 == len(list(build_base.rglob('my_module/__init__.py')))
+            build_base = Path(dirhash_capture_task.context.args.build_base)
+            assert Path(build_base, 'cache/colcon_capture.yaml').exists()
 
-            install_base = Path(python_build_task.context.args.install_base)
-            assert 1 == len(list(install_base.rglob('my_module/__init__.py')))
-
-            pkg_info, = install_base.rglob('PKG-INFO')
-            assert 'Name: test-package' in pkg_info.read_text().splitlines()
     finally:
         event_loop.close()

@@ -1,6 +1,8 @@
 acdmr
 andhus
 apache
+asyncio
+autouse
 basepath
 checksum
 checksums
@@ -20,6 +22,7 @@ https
 iterdir
 lockfile
 lockfiles
+monkeypatch
 nargs
 noqa
 pathlib
