@@ -78,7 +78,7 @@ class LockPackageSelectionExtension(PackageSelectionExtensionPoint):
                     if verb_lockfile.is_changed():
                         package_kind = ('changed')
 
-            if package_kind is not None:
+            if package_kind:
                 logger.info(
                     "Skipping {package_kind} package '{pkg.name}' in "
                     "'{pkg.path}'".format_map(locals()))

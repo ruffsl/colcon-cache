@@ -100,7 +100,7 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
                                     "'{verb_name}' lockfiles"
                                     .format_map(locals()))
 
-            if package_kind is not None:
+            if package_kind:
                 logger.info(
                     "Skipping {package_kind} package '{pkg.name}' in "
                     "'{pkg.path}'".format_map(locals()))

@@ -32,6 +32,6 @@ class GitPackageAugmentation(PackageAugmentationExtensionPoint):
             repo = Repo(desc.path, search_parent_directories=True)
         except InvalidGitRepositoryError:
             repo = None
-        if repo is not None:
+        if repo:
             data = {'vcs_type': VCS_TYPE}
             update_descriptor(desc, data, additional_argument_names=['*'])
