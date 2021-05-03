@@ -11,7 +11,7 @@ from colcon_core.plugin_system import satisfies_version
 
 
 class LockPackageSelectionExtension(PackageSelectionExtensionPoint):
-    """Skip a set of packages based on lockfiles from current capture."""
+    """Skip a set of packages based on lockfiles from current lock."""
 
     def __init__(self):  # noqa: D107
         super().__init__()

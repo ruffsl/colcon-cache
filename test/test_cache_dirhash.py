@@ -8,9 +8,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 
-from colcon_cache.subverb.capture import \
-    CaptureCachePackageArguments
-from colcon_cache.task.capture.dirhash import DirhashCaptureTask
+from colcon_cache.subverb.lock import \
+    LockCachePackageArguments
+from colcon_cache.task.lock.dirhash import DirhashLockTask
 from colcon_core.package_descriptor import PackageDescriptor
 from colcon_core.plugin_system import SkipExtensionException
 import colcon_core.shell
@@ -55,7 +55,7 @@ def test_cache_package():
     try:
         with TemporaryDirectory(prefix='test_colcon_') as tmp_path_str:
             tmp_path = Path(tmp_path_str)
-            dirhash_capture_task = DirhashCaptureTask()
+            dirhash_lock_task = DirhashLockTask()
             package = PackageDescriptor(tmp_path / 'src')
             package.name = 'test_package'
             package.type = 'python'
@@ -80,7 +80,7 @@ def test_cache_package():
                     build_base=str(tmp_path / 'build'),
                     ignore_dependencies=False,
                 )
-            package_args = CaptureCachePackageArguments(
+            package_args = LockCachePackageArguments(
                 package, args, additional_destinations=additional_destinations)
 
             context = TaskContext(
@@ -88,8 +88,8 @@ def test_cache_package():
                 args=package_args,
                 dependencies={}
             )
-            dirhash_capture_task.set_context(context=context)
-            pkg = dirhash_capture_task.context.pkg
+            dirhash_lock_task.set_context(context=context)
+            pkg = dirhash_lock_task.context.pkg
 
             pkg.path.mkdir()
             (pkg.path / 'setup.py').write_text(
@@ -102,11 +102,11 @@ def test_cache_package():
             (pkg.path / 'my_module').mkdir()
             (pkg.path / 'my_module' / '__init__.py').touch()
 
-            rc = event_loop.run_until_complete(dirhash_capture_task.capture())
+            rc = event_loop.run_until_complete(dirhash_lock_task.lock())
             assert not rc
 
-            build_base = Path(dirhash_capture_task.context.args.build_base)
-            assert Path(build_base, 'cache/colcon_capture.yaml').exists()
+            build_base = Path(dirhash_lock_task.context.args.build_base)
+            assert Path(build_base, 'cache/colcon_lock.yaml').exists()
 
     finally:
         event_loop.close()
