@@ -10,8 +10,8 @@ mkdir -p ~/ws/src && cd ~/ws
 wget https://raw.githubusercontent.com/colcon/colcon.readthedocs.org/main/colcon.repos
 vcs import src < colcon.repos
 
-# capture cache of workspace source
-colcon cache capture
+# lock cache of workspace source
+colcon cache lock
 
 # build and test workspace
 colcon build
@@ -20,8 +20,8 @@ colcon test
 # change package source
 echo "#foo" >> src/colcon-cmake/setup.py
 
-# update cache capture
-colcon cache capture
+# update cache lock
+colcon cache lock
 
 # list changed packges by comparing lockfile checksums
 PKGS_CHANGED=$(colcon list --packages-select-lock-changed | xarg)
@@ -33,8 +33,8 @@ colcon build --packages-above $PKGS_CHANGED
 echo "#bar" >> src/colcon-cmake/setup.py
 echo "#baz" >> src/colcon-package-information/setup.py
 
-# update cache capture again
-colcon cache capture
+# update cache lock again
+colcon cache lock
 
 # rebuild changed packages by comparing verb lockfiles
 colcon build --packages-skip-cache-hit

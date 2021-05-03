@@ -8,7 +8,7 @@ from pathlib import Path
 from colcon_cache.cache import CacheLockfile
 from colcon_cache.event_handler \
     import get_previous_lockfile, set_lockfile
-from colcon_cache.task.capture import get_dependencies_lockfiles
+from colcon_cache.task.lock import get_dependencies_lockfiles
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
@@ -19,8 +19,8 @@ logger = colcon_logger.getChild(__name__)
 ENTRY_TYPE = 'git'
 
 
-class GitCaptureTask(TaskExtensionPoint):
-    """Capture caches of packages via git."""
+class GitLockTask(TaskExtensionPoint):
+    """Lock caches of packages via git."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -58,7 +58,7 @@ class GitCaptureTask(TaskExtensionPoint):
                 )
             )
 
-    async def capture(self, *, additional_hooks=None):  # noqa: D102
+    async def lock(self, *, additional_hooks=None):  # noqa: D102
         pkg = self.context.pkg
         args = self.context.args
 

@@ -29,12 +29,12 @@ from colcon_core.verb import logger
 from colcon_core.verb import update_object
 
 
-class CaptureCachePackageArguments:
-    """Arguments to cache capture a specific package."""
+class LockCachePackageArguments:
+    """Arguments to cache lock a specific package."""
 
     def __init__(self, pkg, args, *, additional_destinations=None):
         """
-        Construct a CaptureCachePackageArguments.
+        Construct a LockCachePackageArguments.
 
         :param pkg: The package descriptor
         :param args: The parsed command line arguments
@@ -54,16 +54,16 @@ class CaptureCachePackageArguments:
             if hasattr(args, dest):
                 update_object(
                     self, dest, getattr(args, dest),
-                    pkg.name, 'cache capture', 'command line')
+                    pkg.name, 'cache lock', 'command line')
             # from the package metadata
             if dest in pkg.metadata:
                 update_object(
                     self, dest, pkg.metadata[dest],
-                    pkg.name, 'cache capture', 'package metadata')
+                    pkg.name, 'cache lock', 'package metadata')
 
 
-class CaptureCacheSubverb(CacheSubverbExtensionPoint):
-    """Capture current cache for packages."""
+class LockCacheSubverb(CacheSubverbExtensionPoint):
+    """Lock current cache for packages."""
 
     def __init__(self):  # noqa: D107
         super().__init__()
@@ -86,7 +86,7 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
         add_packages_arguments(parser)
 
         decorated_parser = DestinationCollectorDecorator(parser)
-        add_task_arguments(decorated_parser, 'colcon_cache.task.capture')
+        add_task_arguments(decorated_parser, 'colcon_cache.task.lock')
         self.task_argument_destinations = decorated_parser.get_destinations()
 
     def main(self, *, context):  # noqa: D102
@@ -139,10 +139,10 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
                 continue
 
             extension = get_task_extension(
-                'colcon_cache.task.capture', pkg.metadata['vcs_type'])
+                'colcon_cache.task.lock', pkg.metadata['vcs_type'])
             if not extension:
                 logger.warning(
-                    "No task extension to 'cache capture' "
+                    "No task extension to 'cache lock' "
                     "a '{pkg.type}' package"
                     .format_map(locals()))
                 continue
@@ -152,7 +152,7 @@ class CaptureCacheSubverb(CacheSubverbExtensionPoint):
                 dep_path = Path(args.build_base) / dep_name
                 recursive_dependencies[dep_name] = dep_path
 
-            package_args = CaptureCachePackageArguments(
+            package_args = LockCachePackageArguments(
                 pkg, args, additional_destinations=self
                 .task_argument_destinations.values())
             ordered_package_args = ', '.join([
