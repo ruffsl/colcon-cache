@@ -1,3 +1,4 @@
-GitPython
 dirhash
 git+https://github.com/colcon/colcon-core
+GitPython
+PyYAML
