@@ -5,7 +5,7 @@
 from colcon_core.package_augmentation import PackageAugmentationExtensionPoint
 from colcon_core.package_augmentation import update_descriptor
 from colcon_core.plugin_system import satisfies_version
-from git import Repo
+from git import InvalidGitRepositoryError, Repo
 
 VCS_TYPE = 'git'
 
@@ -28,7 +28,10 @@ class GitPackageAugmentation(PackageAugmentationExtensionPoint):
     ):
         # deliberately ignore the package type
         # since this extension can contribute meta information to any package
-        repo = Repo(desc.path, search_parent_directories=True)
-        if repo is not None:
+        try:
+            repo = Repo(desc.path, search_parent_directories=True)
+        except InvalidGitRepositoryError:
+            repo = None
+        if repo:
             data = {'vcs_type': VCS_TYPE}
             update_descriptor(desc, data, additional_argument_names=['*'])

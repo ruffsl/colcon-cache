@@ -1,10 +1,14 @@
 acdmr
 andhus
 apache
+asyncio
+autouse
+basepath
 checksum
 checksums
 colcon
 contextlib
+deepcopy
 dirhash
 downcased
 fromhex
@@ -19,6 +23,7 @@ https
 iterdir
 lockfile
 lockfiles
+monkeypatch
 nargs
 noqa
 pathlib
@@ -32,6 +37,7 @@ subparser
 subparsers
 subverb
 symlink
+tempfile
 thomas
 todo
 unmerged

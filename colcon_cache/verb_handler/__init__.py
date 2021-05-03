@@ -2,11 +2,9 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
-# from colcon_core.logging import colcon_logger
+from colcon_cache.event_handler import get_previous_lockfile
 from colcon_core.plugin_system import instantiate_extensions
 from colcon_core.plugin_system import order_extensions_by_name
-
-# logger = colcon_logger.getChild(__name__)
 
 
 class VerbHandlerExtensionPoint:
@@ -32,23 +30,23 @@ class VerbHandlerExtensionPoint:
         """
         Get current lockfile for verb.
 
-        This method must be overridden in a subclass.
+        This method can be overridden in a subclass.
 
         :param package_build_base: Base build path for package
         :returns: A lockfile, or None
         """
-        raise NotImplementedError()
+        return get_previous_lockfile(package_build_base, self.verb_name)
 
     def get_reference_lockfile(self, package_build_base):
         """
         Get reference lockfile for verb.
 
-        This method must be overridden in a subclass.
+        This method can be overridden in a subclass.
 
         :param package_build_base: Base build path for package
         :returns: A lockfile, or None
         """
-        raise NotImplementedError()
+        return get_previous_lockfile(package_build_base, self.reference_name)
 
     def get_job_lockfile(self, job):
         """
