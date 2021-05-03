@@ -1,0 +1,9 @@
+checksums:
+  current: '123'
+  reference: '123'
+dependencies:
+  bar: '456'
+  foo: '123'
+lock_type: foo
+metadata: {}
+version: 0.0.1

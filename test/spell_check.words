@@ -8,6 +8,7 @@ checksum
 checksums
 colcon
 contextlib
+deepcopy
 dirhash
 downcased
 fromhex
