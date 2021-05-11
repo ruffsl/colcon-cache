@@ -21,27 +21,33 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-cache-miss', action='store_true',
+            '--packages-select-cache-void', action='store_true',
             help='Only process a subset of packages that miss its '
                  'reference cache (packages without a reference cache '
                  'are not considered as cache miss)')
         group.add_argument(
-            '--packages-skip-cache-hit', action='store_true',
+            '--packages-skip-cache-valid', action='store_true',
             help='Skip a set of packages which hit its '
                  'reference cache (packages without a verb cache '
                  'are not considered as cache hit)')
+        parser.add_argument(
+            '--packages-respective-cache-verb',
+            choices=get_verb_handler_extensions().keys(),
+            default=None,
+            help='Only process caches for respective verb. '
+                 'Defaults to invoked verb if unspecified.')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_cache_miss,
-            args.packages_skip_cache_hit,
+            args.packages_select_cache_void,
+            args.packages_skip_cache_valid,
         )):
             return
 
-        if args.packages_select_cache_miss:
-            argument = '--packages-select-cache-miss'
-        elif args.packages_skip_cache_hit:
-            argument = '--packages-skip-cache-hit'
+        if args.packages_select_cache_void:
+            argument = '--packages-select-cache-void'
+        elif args.packages_skip_cache_valid:
+            argument = '--packages-skip-cache-valid'
         else:
             assert False
 
@@ -49,20 +55,23 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             logger.warning(
                 "Ignoring '{argument}' since the invoked verb doesn't have a "
                 "'--build-base' argument and therefore can't access "
-                'information about the previous state of a package'
+                'information about the relative state of a package'
                 .format_map(locals()))
             return
 
-        verb_name = args.verb_name
+        verb_name = args.packages_respective_cache_verb
+        if not verb_name:
+            verb_name = args.verb_name
         verb_handler_extensions = get_verb_handler_extensions()
 
         if verb_name in verb_handler_extensions:
             verb_handler_extension = verb_handler_extensions[verb_name]
         else:
             logger.warning(
-                "Ignoring '{argument}' since the invoked verb doesn't have a "
-                "colcon cache verb handler extension and therefore can't "
-                'access information about the previous state of a package'
+                "Ignoring '{argument}' since the respective verb "
+                "'{verb_name}' doesn't have a colcon cache verb "
+                "handler extension and therefore can't access "
+                'information about the relative state of a package'
                 .format_map(locals()))
             return
 
@@ -89,7 +98,7 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             elif verb_lockfile is None:
                 missing_kind = verb_name
 
-            if args.packages_select_cache_miss:
+            if args.packages_select_cache_void:
                 if missing_kind == reference_name:
                     package_kind = ("missing '{reference_name}' lockfile"
                                     .format_map(locals()))
