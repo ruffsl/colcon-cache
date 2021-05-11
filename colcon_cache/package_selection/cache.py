@@ -4,7 +4,6 @@
 
 import os
 
-from colcon_cache.package_selection.argument import argument_verb_name
 from colcon_cache.verb_handler import get_verb_handler_extensions
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
@@ -32,11 +31,11 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
                  'reference cache (packages without a verb cache '
                  'are not considered as cache hit)')
         parser.add_argument(
-            '--verbs-respective-cache', nargs='*', metavar='VERB_NAME',
-            default=[],
-            type=argument_verb_name,
-            help='Only process caches for subset of verbs. '
-                 'Defaults to include invoked verb if unspecified.')
+            '--packages-respective-cache-verb',
+            choices=get_verb_handler_extensions().keys(),
+            default=None,
+            help='Only process caches for respective verb. '
+                 'Defaults to invoked verb if unspecified.')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
@@ -60,58 +59,58 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
                 .format_map(locals()))
             return
 
-        if not args.verbs_respective_cache:
-            args.verbs_respective_cache = [args.verb_name]
+        verb_name = args.packages_respective_cache_verb
+        if not verb_name:
+            verb_name = args.verb_name
         verb_handler_extensions = get_verb_handler_extensions()
 
-        for verb_name in args.verbs_respective_cache:
-            if verb_name in verb_handler_extensions:
-                verb_handler_extension = verb_handler_extensions[verb_name]
-            else:
-                logger.warning(
-                    "Ignoring '{argument}' since the respective verb "
-                    "'{verb_name}' doesn't have a colcon cache verb "
-                    "handler extension and therefore can't access "
-                    'information about the relative state of a package'
-                    .format_map(locals()))
-                return
+        if verb_name in verb_handler_extensions:
+            verb_handler_extension = verb_handler_extensions[verb_name]
+        else:
+            logger.warning(
+                "Ignoring '{argument}' since the respective verb "
+                "'{verb_name}' doesn't have a colcon cache verb "
+                "handler extension and therefore can't access "
+                'information about the relative state of a package'
+                .format_map(locals()))
+            return
 
-            for decorator in decorators:
-                # skip packages which have already been ruled out
-                if not decorator.selected:
-                    continue
+        for decorator in decorators:
+            # skip packages which have already been ruled out
+            if not decorator.selected:
+                continue
 
-                pkg = decorator.descriptor
+            pkg = decorator.descriptor
 
-                package_build_base = os.path.join(
-                    args.build_base, pkg.name)
+            package_build_base = os.path.join(
+                args.build_base, pkg.name)
 
-                verb_lockfile = verb_handler_extension\
-                    .get_current_lockfile(package_build_base)
-                reference_lockfile = verb_handler_extension\
-                    .get_reference_lockfile(package_build_base)
-                reference_name = verb_handler_extension.reference_name
+            verb_lockfile = verb_handler_extension\
+                .get_current_lockfile(package_build_base)
+            reference_lockfile = verb_handler_extension\
+                .get_reference_lockfile(package_build_base)
+            reference_name = verb_handler_extension.reference_name
 
-                package_kind = None
-                missing_kind = None
-                if reference_lockfile is None:
-                    missing_kind = reference_name
-                elif verb_lockfile is None:
-                    missing_kind = verb_name
+            package_kind = None
+            missing_kind = None
+            if reference_lockfile is None:
+                missing_kind = reference_name
+            elif verb_lockfile is None:
+                missing_kind = verb_name
 
-                if args.packages_select_cache_void:
-                    if missing_kind == reference_name:
-                        package_kind = ("missing '{reference_name}' lockfile"
-                                        .format_map(locals()))
+            if args.packages_select_cache_void:
+                if missing_kind == reference_name:
+                    package_kind = ("missing '{reference_name}' lockfile"
+                                    .format_map(locals()))
 
-                if missing_kind is None:
-                    if reference_lockfile == verb_lockfile:
-                        package_kind = ("matching '{reference_name}' and "
-                                        "'{verb_name}' lockfiles"
-                                        .format_map(locals()))
+            if missing_kind is None:
+                if reference_lockfile == verb_lockfile:
+                    package_kind = ("matching '{reference_name}' and "
+                                    "'{verb_name}' lockfiles"
+                                    .format_map(locals()))
 
-                if package_kind:
-                    logger.info(
-                        "Skipping {package_kind} package '{pkg.name}' in "
-                        "'{pkg.path}'".format_map(locals()))
-                    decorator.selected = False
+            if package_kind:
+                logger.info(
+                    "Skipping {package_kind} package '{pkg.name}' in "
+                    "'{pkg.path}'".format_map(locals()))
+                decorator.selected = False
