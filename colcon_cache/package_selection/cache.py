@@ -21,27 +21,27 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-cache-miss', action='store_true',
+            '--packages-select-cache-void', action='store_true',
             help='Only process a subset of packages that miss its '
                  'reference cache (packages without a reference cache '
                  'are not considered as cache miss)')
         group.add_argument(
-            '--packages-skip-cache-hit', action='store_true',
+            '--packages-skip-cache-valid', action='store_true',
             help='Skip a set of packages which hit its '
                  'reference cache (packages without a verb cache '
                  'are not considered as cache hit)')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_cache_miss,
-            args.packages_skip_cache_hit,
+            args.packages_select_cache_void,
+            args.packages_skip_cache_valid,
         )):
             return
 
-        if args.packages_select_cache_miss:
-            argument = '--packages-select-cache-miss'
-        elif args.packages_skip_cache_hit:
-            argument = '--packages-skip-cache-hit'
+        if args.packages_select_cache_void:
+            argument = '--packages-select-cache-void'
+        elif args.packages_skip_cache_valid:
+            argument = '--packages-skip-cache-valid'
         else:
             assert False
 
@@ -89,7 +89,7 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             elif verb_lockfile is None:
                 missing_kind = verb_name
 
-            if args.packages_select_cache_miss:
+            if args.packages_select_cache_void:
                 if missing_kind == reference_name:
                     package_kind = ("missing '{reference_name}' lockfile"
                                     .format_map(locals()))

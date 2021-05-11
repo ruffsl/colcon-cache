@@ -37,10 +37,10 @@ echo "#baz" >> src/colcon-package-information/setup.py
 colcon cache lock
 
 # rebuild changed packages by comparing verb lockfiles
-colcon build --packages-skip-cache-hit
+colcon build --packages-skip-cache-valid
 
 # retest packages with any untested build changes
-colcon test  --packages-skip-cache-hit
+colcon test  --packages-skip-cache-valid
 
 # list generated lockfiles from each verb
 ls build/colcon-cmake/cache
