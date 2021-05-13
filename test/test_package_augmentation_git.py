@@ -3,7 +3,7 @@
 
 from tempfile import TemporaryDirectory
 
-from colcon_cache.package_augmentation.dirhash \
+from colcon_cache.package_augmentation.cache_dirhash \
     import DirhashPackageAugmentation
 from colcon_core.package_descriptor import PackageDescriptor
 

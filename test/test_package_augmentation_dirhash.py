@@ -3,7 +3,7 @@
 
 from tempfile import TemporaryDirectory
 
-from colcon_cache.package_augmentation.git \
+from colcon_cache.package_augmentation.cache_git \
     import GitPackageAugmentation
 from colcon_core.package_descriptor import PackageDescriptor
 from git import Repo
