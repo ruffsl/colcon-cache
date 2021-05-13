@@ -34,7 +34,7 @@ def test_cache_lockfile():
     lockfile_b.lock_type = lockfile_a.lock_type
     lockfile_b.checksums.current = '456'
     assert lockfile_a != lockfile_b
-    assert lockfile_b.is_changed()
+    assert lockfile_b.is_modified()
 
     dep_lockfiles = {
         'foo': lockfile_a,

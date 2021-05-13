@@ -11,6 +11,7 @@ contextlib
 deepcopy
 dirhash
 downcased
+fallbacks
 fromhex
 getaffinity
 github

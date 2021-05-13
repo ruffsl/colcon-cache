@@ -4,44 +4,66 @@ An extension for [colcon-core](https://github.com/colcon/colcon-core) to cache p
 
 ## Example usage
 
+Setup workspace:
 ```
-# setup workspace
 mkdir -p ~/ws/src && cd ~/ws
 wget https://raw.githubusercontent.com/colcon/colcon.readthedocs.org/main/colcon.repos
 vcs import src < colcon.repos
+```
 
-# lock cache of workspace source
+Lock workspace by generating `cache` lockfiles:
+```
 colcon cache lock
+```
 
-# build and test workspace
+Build and test workspace:
+```
 colcon build
 colcon test
+```
 
-# change package source
+Modify package source:
+```
 echo "#foo" >> src/colcon-cmake/setup.py
+```
 
-# update cache lock
+Update `cache` lockfiles:
+```
 colcon cache lock
+```
 
-# list changed packges by comparing lockfile checksums
-PKGS_CHANGED=$(colcon list --packages-select-lock-changed | xarg)
+List modified packges by comparing `cache` lockfile checksums
+```
+PKGS_MODIFIED=$(colcon list --packages-select-cache-modified | xarg)
+```
 
-# rebuild only changed packages and above
-colcon build --packages-above $PKGS_CHANGED
+Rebuild only modified packages and above:
+```
+colcon build --packages-above $PKGS_MODIFIED
+```
 
-# alter package source again
+Modify package source again:
+```
 echo "#bar" >> src/colcon-cmake/setup.py
 echo "#baz" >> src/colcon-package-information/setup.py
+```
 
-# update cache lock again
+Update cache lockfiles again:
+```
 colcon cache lock
+```
 
-# rebuild changed packages by comparing verb lockfiles
+Rebuild by skipping packages with valid `build` lockfiles:
+```
 colcon build --packages-skip-cache-valid
+```
 
-# retest packages with any untested build changes
-colcon test  --packages-skip-cache-valid
+Retest by skipping packages with valid `test` lockfiles:
+```
+colcon test --packages-skip-cache-valid
+```
 
-# list generated lockfiles from each verb
+List generated lockfiles from each `verb`:
+```
 ls build/colcon-cmake/cache
 ```

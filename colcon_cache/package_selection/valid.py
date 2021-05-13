@@ -10,7 +10,7 @@ from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 
 
-class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
+class ValidPackageSelection(PackageSelectionExtensionPoint):
     """Skip a set of packages based on lockfiles from previous caches."""
 
     def __init__(self):  # noqa: D107
@@ -21,31 +21,25 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-cache-void', action='store_true',
-            help='Only process a subset of packages that miss its '
-                 'reference cache (packages without a reference cache '
-                 'are not considered as cache miss)')
+            '--packages-select-cache-invalid', action='store_true',
+            help='Only process a subset of packages with an invalid '
+                 'cache (packages without a reference cache '
+                 'are not considered)')
         group.add_argument(
             '--packages-skip-cache-valid', action='store_true',
-            help='Skip a set of packages which hit its '
-                 'reference cache (packages without a verb cache '
-                 'are not considered as cache hit)')
-        parser.add_argument(
-            '--packages-respective-cache-verb',
-            choices=get_verb_handler_extensions().keys(),
-            default=None,
-            help='Only process caches for respective verb. '
-                 'Defaults to invoked verb if unspecified.')
+            help='Skip a set of packages with a valid '
+                 'cache (packages without a reference cache '
+                 'are not considered)')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_cache_void,
+            args.packages_select_cache_invalid,
             args.packages_skip_cache_valid,
         )):
             return
 
-        if args.packages_select_cache_void:
-            argument = '--packages-select-cache-void'
+        if args.packages_select_cache_invalid:
+            argument = '--packages-select-cache-invalid'
         elif args.packages_skip_cache_valid:
             argument = '--packages-skip-cache-valid'
         else:
@@ -59,7 +53,7 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
                 .format_map(locals()))
             return
 
-        verb_name = args.packages_respective_cache_verb
+        verb_name = args.packages_select_cache_key
         if not verb_name:
             verb_name = args.verb_name
         verb_handler_extensions = get_verb_handler_extensions()
@@ -96,9 +90,9 @@ class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
             if reference_lockfile is None:
                 missing_kind = reference_name
             elif verb_lockfile is None:
-                missing_kind = verb_name
+                missing_kind = verb_handler_extension.verb_name
 
-            if args.packages_select_cache_void:
+            if args.packages_select_cache_invalid:
                 if missing_kind == reference_name:
                     package_kind = ("missing '{reference_name}' lockfile"
                                     .format_map(locals()))
