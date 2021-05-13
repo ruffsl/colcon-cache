@@ -21,15 +21,15 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-cache-void', action='store_true',
-            help='Only process a subset of packages that miss its '
-                 'reference cache (packages without a reference cache '
-                 'are not considered as cache miss)')
+            '--packages-select-cache-invalid', action='store_true',
+            help='Only process a subset of packages with an invalid '
+                 'cache (packages without a reference cache '
+                 'are not considered)')
         group.add_argument(
             '--packages-skip-cache-valid', action='store_true',
-            help='Skip a set of packages which hit its '
-                 'reference cache (packages without a verb cache '
-                 'are not considered as cache hit)')
+            help='Skip a set of packages with a valid '
+                 'cache (packages without a reference cache '
+                 'are not considered)')
         parser.add_argument(
             '--packages-respective-cache-verb',
             choices=get_verb_handler_extensions().keys(),
@@ -39,13 +39,13 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_cache_void,
+            args.packages_select_cache_invalid,
             args.packages_skip_cache_valid,
         )):
             return
 
-        if args.packages_select_cache_void:
-            argument = '--packages-select-cache-void'
+        if args.packages_select_cache_invalid:
+            argument = '--packages-select-cache-invalid'
         elif args.packages_skip_cache_valid:
             argument = '--packages-skip-cache-valid'
         else:
@@ -98,7 +98,7 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
             elif verb_lockfile is None:
                 missing_kind = verb_name
 
-            if args.packages_select_cache_void:
+            if args.packages_select_cache_invalid:
                 if missing_kind == reference_name:
                     package_kind = ("missing '{reference_name}' lockfile"
                                     .format_map(locals()))
