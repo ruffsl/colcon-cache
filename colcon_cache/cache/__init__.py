@@ -26,7 +26,7 @@ class CacheChecksums:
             return False
         return self.current == other.current
 
-    def is_changed(self):  # noqa: D10s
+    def is_modified(self):  # noqa: D10s
         return self.current != self.reference
 
 
@@ -67,8 +67,8 @@ class CacheLockfile:
             return False
         return self.checksums == other.checksums
 
-    def is_changed(self):  # noqa: D10s
-        return self.checksums.is_changed()
+    def is_modified(self):  # noqa: D10s
+        return self.checksums.is_modified()
 
     def update_dependencies(self, dep_lockfiles):  # noqa: D10s
         self.dependencies.clear()
