@@ -90,7 +90,7 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
             if reference_lockfile is None:
                 missing_kind = reference_name
             elif verb_lockfile is None:
-                missing_kind = verb_name
+                missing_kind = verb_handler_extension.verb_name
 
             if args.packages_select_cache_invalid:
                 if missing_kind == reference_name:
