@@ -21,28 +21,28 @@ class LockPackageSelectionExtension(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-lock-changed', action='store_true',
+            '--packages-select-lock-modified', action='store_true',
             help='Only process a subset of packages whose lockfile '
-                 'denote package changes (packages without lockfiles '
-                 'are not considered as changed)')
+                 'denote package modifications (packages without lockfiles '
+                 'are not considered as modified)')
         group.add_argument(
-            '--packages-select-lock-unchanged', action='store_true',
+            '--packages-select-lock-unmodified', action='store_true',
             help='Only process a subset of packages whose lockfile '
-                 'denote no package changes (packages without lockfiles '
-                 'are not considered as unchanged)')
+                 'denote no package modifications (packages without lockfiles '
+                 'are not considered as unmodified)')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_lock_changed,
-            args.packages_select_lock_unchanged,
+            args.packages_select_lock_modified,
+            args.packages_select_lock_unmodified,
         )):
             return
 
         if not hasattr(args, 'build_base'):
-            if args.packages_select_lock_changed:
-                argument = '--packages-select-lock-changed'
-            elif args.packages_select_lock_unchanged:
-                argument = '--packages-select-lock-unchanged'
+            if args.packages_select_lock_modified:
+                argument = '--packages-select-lock-modified'
+            elif args.packages_select_lock_unmodified:
+                argument = '--packages-select-lock-unmodified'
             else:
                 assert False
             logger.warning(
@@ -70,13 +70,13 @@ class LockPackageSelectionExtension(PackageSelectionExtensionPoint):
             if verb_lockfile is None:
                 package_kind = ('without lockfile')
             else:
-                if args.packages_select_lock_changed:
-                    if not verb_lockfile.is_changed():
-                        package_kind = ('unchanged')
+                if args.packages_select_lock_modified:
+                    if not verb_lockfile.is_modified():
+                        package_kind = ('unmodified')
 
-                if args.packages_select_lock_unchanged:
-                    if verb_lockfile.is_changed():
-                        package_kind = ('changed')
+                if args.packages_select_lock_unmodified:
+                    if verb_lockfile.is_modified():
+                        package_kind = ('modified')
 
             if package_kind:
                 logger.info(
