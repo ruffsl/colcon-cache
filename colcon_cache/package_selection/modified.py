@@ -4,7 +4,7 @@
 
 import os
 
-from colcon_cache.event_handler import get_previous_lockfile
+from colcon_cache.verb_handler import get_verb_handler_extensions
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
@@ -52,6 +52,22 @@ class ModifiedPackageSelection(PackageSelectionExtensionPoint):
                 .format_map(locals()))
             return
 
+        verb_name = args.packages_select_cache_key
+        if not verb_name:
+            verb_name = args.verb_name
+        verb_handler_extensions = get_verb_handler_extensions()
+
+        if verb_name in verb_handler_extensions:
+            verb_handler_extension = verb_handler_extensions[verb_name]
+        else:
+            logger.warning(
+                "Ignoring '{argument}' since the respective verb "
+                "'{verb_name}' doesn't have a colcon cache verb "
+                "handler extension and therefore can't access "
+                'information about the relative state of a package'
+                .format_map(locals()))
+            return
+
         for decorator in decorators:
             # skip packages which have already been ruled out
             if not decorator.selected:
@@ -59,12 +75,11 @@ class ModifiedPackageSelection(PackageSelectionExtensionPoint):
 
             pkg = decorator.descriptor
 
-            verb_name = 'cache'
-
             package_build_base = os.path.join(
                 args.build_base, pkg.name)
-            verb_lockfile = get_previous_lockfile(
-                package_build_base, verb_name)
+
+            verb_lockfile = verb_handler_extension\
+                .get_current_lockfile(package_build_base)
 
             package_kind = None
             if verb_lockfile is None:

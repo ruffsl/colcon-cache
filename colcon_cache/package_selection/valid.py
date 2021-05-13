@@ -30,12 +30,6 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
             help='Skip a set of packages with a valid '
                  'cache (packages without a reference cache '
                  'are not considered)')
-        parser.add_argument(
-            '--packages-respective-cache-verb',
-            choices=get_verb_handler_extensions().keys(),
-            default=None,
-            help='Only process caches for respective verb. '
-                 'Defaults to invoked verb if unspecified.')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
@@ -59,7 +53,7 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
                 .format_map(locals()))
             return
 
-        verb_name = args.packages_respective_cache_verb
+        verb_name = args.packages_select_cache_key
         if not verb_name:
             verb_name = args.verb_name
         verb_handler_extensions = get_verb_handler_extensions()
