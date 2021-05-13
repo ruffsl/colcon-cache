@@ -21,28 +21,28 @@ class ModifiedPackageSelection(PackageSelectionExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--packages-select-lock-modified', action='store_true',
-            help='Only process a subset of packages whose lockfile '
+            '--packages-select-cache-modified', action='store_true',
+            help='Only process a subset of packages whose cache '
                  'denote package modifications (packages without lockfiles '
                  'are not considered as modified)')
         group.add_argument(
-            '--packages-select-lock-unmodified', action='store_true',
-            help='Only process a subset of packages whose lockfile '
+            '--packages-select-cache-unmodified', action='store_true',
+            help='Only process a subset of packages whose cache '
                  'denote no package modifications (packages without lockfiles '
                  'are not considered as unmodified)')
 
     def select_packages(self, args, decorators):  # noqa: D102
         if not any((
-            args.packages_select_lock_modified,
-            args.packages_select_lock_unmodified,
+            args.packages_select_cache_modified,
+            args.packages_select_cache_unmodified,
         )):
             return
 
         if not hasattr(args, 'build_base'):
-            if args.packages_select_lock_modified:
-                argument = '--packages-select-lock-modified'
-            elif args.packages_select_lock_unmodified:
-                argument = '--packages-select-lock-unmodified'
+            if args.packages_select_cache_modified:
+                argument = '--packages-select-cache-modified'
+            elif args.packages_select_cache_unmodified:
+                argument = '--packages-select-cache-unmodified'
             else:
                 assert False
             logger.warning(
@@ -70,11 +70,11 @@ class ModifiedPackageSelection(PackageSelectionExtensionPoint):
             if verb_lockfile is None:
                 package_kind = ('without lockfile')
             else:
-                if args.packages_select_lock_modified:
+                if args.packages_select_cache_modified:
                     if not verb_lockfile.is_modified():
                         package_kind = ('unmodified')
 
-                if args.packages_select_lock_unmodified:
+                if args.packages_select_cache_unmodified:
                     if verb_lockfile.is_modified():
                         package_kind = ('modified')
 

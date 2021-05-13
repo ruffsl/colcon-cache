@@ -34,7 +34,7 @@ colcon cache lock
 
 List modified packges by comparing `cache` lockfile checksums
 ```
-PKGS_MODIFIED=$(colcon list --packages-select-lock-modified | xarg)
+PKGS_MODIFIED=$(colcon list --packages-select-cache-modified | xarg)
 ```
 
 Rebuild only modified packages and above:
