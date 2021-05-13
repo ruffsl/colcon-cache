@@ -10,7 +10,7 @@ from colcon_core.package_selection import PackageSelectionExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 
 
-class CachePackageSelectionExtension(PackageSelectionExtensionPoint):
+class ValidPackageSelection(PackageSelectionExtensionPoint):
     """Skip a set of packages based on lockfiles from previous caches."""
 
     def __init__(self):  # noqa: D107
