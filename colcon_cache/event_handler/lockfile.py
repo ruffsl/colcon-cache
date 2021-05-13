@@ -12,7 +12,7 @@ from colcon_core.event_handler import EventHandlerExtensionPoint
 from colcon_core.plugin_system import satisfies_version
 
 
-class CacheLockfileEventHandler(EventHandlerExtensionPoint):
+class LockfileEventHandler(EventHandlerExtensionPoint):
     """
     Persist the lockfile of a job in a file in its build directory.
 
