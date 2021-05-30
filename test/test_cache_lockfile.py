@@ -49,7 +49,7 @@ def test_cache_lockfile():
         lockfile_a_path.parent.mkdir(parents=True, exist_ok=True)
         lockfile_c_path = pathlib.Path(
             pathlib.Path(__file__).parent.absolute(),
-            'cache', 'colcon_cache_example_1.yaml')
+            'cache', 'colcon_cache_example_1.json')
         lockfile_a.dump(lockfile_a_path)
         assert lockfile_a_path.read_text() == lockfile_c_path.read_text()
 
@@ -61,7 +61,7 @@ def test_cache_lockfile():
         lockfile_b_path.parent.mkdir(parents=True, exist_ok=True)
         lockfile_d_path = pathlib.Path(
             pathlib.Path(__file__).parent.absolute(),
-            'cache', 'colcon_cache_example_2.yaml')
+            'cache', 'colcon_cache_example_2.json')
         lockfile_b.dump(lockfile_b_path)
         assert lockfile_b_path.read_text() == lockfile_d_path.read_text()
 

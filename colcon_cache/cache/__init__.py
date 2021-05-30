@@ -5,9 +5,8 @@ import json
 import pathlib
 
 from colcon_core.plugin_system import satisfies_version
-import yaml
 
-LOCKFILE_FILENAME = 'colcon_{verb_name}.yaml'
+LOCKFILE_FILENAME = 'colcon_{verb_name}.json'
 LOCKFILE_VERSION = '0.0.1'
 
 
@@ -78,8 +77,8 @@ class CacheLockfile:
                 dep_lockfile.checksums.current
 
     def load(self, path):  # noqa: D102
-        content = path.read_text()
-        data = yaml.safe_load(content)
+        with open(path, 'r') as f:
+            data = json.load(f)
         satisfies_version(data['version'], '^0.0.1')
 
         self.lock_type = data['lock_type']
@@ -90,10 +89,13 @@ class CacheLockfile:
             self.metadata = data['metadata']
 
     def dump(self, path):  # noqa: D102
-        data = json.loads(
-            json.dumps(self, default=lambda o: o.__dict__))
-        path.write_text(
-            yaml.dump(data, sort_keys=True))
+        with open(path, 'w') as f:
+            json.dump(
+                obj=self,
+                fp=f,
+                indent=2,
+                default=lambda o: o.__dict__,
+                sort_keys=True)
 
 
 def get_lockfile_path(package_build_base, verb_name):

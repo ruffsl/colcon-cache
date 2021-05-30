@@ -1,8 +1,0 @@
-checksums:
-  current: '456'
-  reference: '123'
-dependencies: {}
-lock_type: foo
-metadata:
-  baz: spam
-version: 0.0.1
