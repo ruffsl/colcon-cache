@@ -106,7 +106,7 @@ def test_cache_package():
             assert not rc
 
             build_base = Path(dirhash_lock_task.context.args.build_base)
-            assert Path(build_base, 'cache/colcon_lock.yaml').exists()
+            assert Path(build_base, 'cache/colcon_lock.json').exists()
 
     finally:
         event_loop.close()
