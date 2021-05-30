@@ -5,13 +5,20 @@ from collections import OrderedDict
 
 from colcon_cache.event_handler import get_previous_lockfile
 
+_cached_lockfiles = {}
+
 
 def get_dependencies_lockfiles(args, dependencies):  # noqa: D103
+    global _cached_lockfiles
     dependencies_checksums = OrderedDict()
     if not args.ignore_dependencies:
         for dep_name, dep_path in dependencies.items():
-            lockfile = get_previous_lockfile(
-                package_build_base=dep_path,
-                verb_name='cache')
+            if dep_path in _cached_lockfiles:
+                lockfile = _cached_lockfiles[dep_path]
+            else:
+                lockfile = get_previous_lockfile(
+                    package_build_base=dep_path,
+                    verb_name='cache')
+                _cached_lockfiles[dep_path] = lockfile
             dependencies_checksums[dep_name] = lockfile
     return dependencies_checksums
