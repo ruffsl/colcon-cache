@@ -4,10 +4,12 @@ apache
 asyncio
 autouse
 basepath
+chdir
 checksum
 checksums
 colcon
 contextlib
+copytree
 deepcopy
 dirhash
 downcased
@@ -24,6 +26,7 @@ https
 iterdir
 lockfile
 lockfiles
+mkdtemp
 monkeypatch
 nargs
 noqa
@@ -31,6 +34,7 @@ pathlib
 plugin
 pytest
 refrence
+rmtree
 rtype
 scspell
 setuptools
