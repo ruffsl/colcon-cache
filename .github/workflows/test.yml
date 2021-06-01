@@ -1,6 +1,6 @@
 name: Test Workflow
 # on: [pull_request, push]
-on: [pull_request]
+on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
