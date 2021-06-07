@@ -23,6 +23,7 @@ jobs:
         pip install -r test/requirements.txt
     - name: Run tests
       run: |
+        cd ../
         colcon build --symlink-install
         colcon test
         cp ./build/colcon-cache/coverage.xml ./
