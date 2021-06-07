@@ -10,6 +10,8 @@ jobs:
         python-version: [3.8]
     steps:
     - uses: actions/checkout@v2
+      with:
+        path: src/colcon-cache
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -20,12 +22,19 @@ jobs:
         restore-keys: ${{ runner.os }}-pip-
     - name: Install dependencies
       run: |
-        pip install -r test/requirements.txt
+        pip install -r src/colcon-cache/test/requirements.txt
     - name: Run tests
       run: |
-        cd ../
         colcon build --symlink-install
-        colcon test
-        cp ./build/colcon-cache/coverage.xml ./
+        colcon test \
+          --pytest-args "--cov-report=term" \
+          --pytest-with-coverage
+        echo $(pwd)
+        tree .
+        mv build/colcon-cache/coverage.xml src/colcon-cache
+    - uses: actions/upload-artifact@v2
+      with:
+        name: coverage
+        path: ./**/coverage.xml
     - uses: codecov/codecov-action@v1
       if: matrix.python-version == '3.8'
