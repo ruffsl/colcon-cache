@@ -40,6 +40,8 @@ def test_main():
     repo = Repo.init(ws_base / 'src' / 'test-repo')
     repo.git.add(all=True)
     repo.git.commit(message='initial commit')
+    repo.config_writer().set_value('user', 'name', 'myusername').release()
+    repo.config_writer().set_value('user', 'email', 'myemail').release()
 
     try:
         main(argv=argv + ['cache', 'lock'])
