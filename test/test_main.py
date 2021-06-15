@@ -19,6 +19,12 @@ def test_main():
     argv = []
 
     try:
+        main(argv=argv + ['build'])
+        main(argv=argv + ['list', '--packages-select-cache-modified'])
+        main(argv=argv + ['list', '--packages-select-cache-unmodified'])
+        main(argv=argv + ['list', '--packages-select-cache-invalid'])
+        main(argv=argv + ['list', '--packages-skip-cache-valid'])
+
         main(argv=argv + ['cache', 'lock', '--ignore-dependencies'])
         main(argv=argv + ['cache', 'lock', '--dirhash-ratchet'])
         main(argv=argv + ['cache', 'lock', '--dirhash-reset'])
@@ -71,7 +77,23 @@ def test_main():
             f.write('def test_empty():\n    assert False\n')
 
         main(argv=argv + ['cache', 'lock'])
+
+        main(argv=argv + ['list', '--packages-select-cache-modified'])
+        main(argv=argv + ['list', '--packages-select-cache-unmodified'])
+        main(argv=argv + ['list', '--packages-select-cache-invalid'])
+        main(argv=argv + ['list', '--packages-skip-cache-valid'])
+
         main(argv=argv + ['build'])
+
+        main(argv=argv + [
+            'list',
+            '--packages-select-cache-invalid',
+            '--packages-select-cache-key', 'test'])
+        main(argv=argv + [
+            'list',
+            '--packages-skip-cache-valid',
+            '--packages-select-cache-key', 'test'])
+
         main(argv=argv + ['test'])
         main(argv=argv + ['test-result'])
 
