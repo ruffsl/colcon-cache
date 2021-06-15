@@ -23,6 +23,4 @@ fixes:
   - "build/lib/::"
 
 ignore:
-  - "test/test_copyright_license.py"
-  - "test/test_flake8.py"
-  - "test/test_spell_check.py"
+  - "test"
