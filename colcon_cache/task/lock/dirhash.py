@@ -204,9 +204,8 @@ class DirhashLockTask(TaskExtensionPoint):
             with suppress(AttributeError):
                 # consider restricted set of CPUs if applicable
                 jobs = min(jobs, len(os.sched_getaffinity(0)))
-            if jobs is None:
-                # the number of cores can't be determined
-                jobs = 1
+            # if the number of cores can't be determined
+            jobs = max(filter(None.__ne__, [1, jobs]))
             args.dirhash_jobs = jobs
 
         kwargs = vars(args).copy()
