@@ -48,12 +48,13 @@ def test_main():
     repo.git.commit(message='initial commit')
 
     try:
+        main(argv=argv + ['cache', 'lock'])
         main(argv=argv + ['cache', 'lock', '--git-reference-revision=HEAD'])
 
         test_file = \
             ws_base / 'src' / 'test-repo' / 'test-package-b' / 'setup.py'
-        with open(test_file, 'w') as f:
-            f.write('# foo\n')
+        with open(test_file, 'a') as f:
+            f.write('\n# foo\n')
 
         main(argv=argv + ['cache', 'lock'])
         main(argv=argv + ['build'])
