@@ -1,8 +1,6 @@
 acdmr
 andhus
 apache
-asyncio
-autouse
 basepath
 chdir
 checksum
@@ -27,7 +25,6 @@ iterdir
 lockfile
 lockfiles
 mkdtemp
-monkeypatch
 nargs
 noqa
 pathlib
