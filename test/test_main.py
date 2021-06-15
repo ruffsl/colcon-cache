@@ -19,6 +19,10 @@ def test_main():
     argv = []
 
     try:
+        main(argv=argv + ['cache', 'lock', '--ignore-dependencies'])
+        main(argv=argv + ['cache', 'lock', '--dirhash-ratchet'])
+        main(argv=argv + ['cache', 'lock', '--dirhash-reset'])
+        main(argv=argv + ['cache', 'lock', '--dirhash-jobs=1'])
         main(argv=argv + ['cache', 'lock'])
         main(argv=argv + ['build'])
         main(argv=argv + ['test'])
