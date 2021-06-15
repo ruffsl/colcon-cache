@@ -64,6 +64,31 @@ def test_main():
         main(argv=argv + ['list', '--packages-select-cache-invalid'])
         main(argv=argv + ['list', '--packages-skip-cache-valid'])
         print('ws_base: ', ws_base)
+
+        test_file = \
+            ws_base / 'src' / 'test-repo' / 'test-package-b' / 'test_fail.py'
+        with open(test_file, 'w') as f:
+            f.write('def test_empty():\n    assert False\n')
+
+        main(argv=argv + ['cache', 'lock'])
+        main(argv=argv + ['build'])
+        main(argv=argv + ['test'])
+        main(argv=argv + ['test-result'])
+
+        test_file = \
+            ws_base / 'src' / 'test-repo' / 'test-package-b' / 'setup.py'
+        with open(test_file, 'a') as f:
+            f.write('assert False\n')
+        main(argv=argv + [
+            'cache', 'lock', '--packages-select', 'test-package-b'])
+        main(argv=argv + ['build'])
+
+        # test_file = \
+        #     ws_base / 'colcon.meta'
+        # with open(test_file, 'w') as f:
+        #     f.write('{"names": {"test-package-b": {"vcs_type": "foo"}}}\n')
+        # main(argv=argv + ['cache', 'lock', '--metas', 'colcon.meta'])
+
     finally:
         # the logging subsystem might still have file handles pending
         # therefore only try to delete the temporary directory
