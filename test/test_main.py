@@ -21,6 +21,10 @@ def test_main():
         main(argv=argv + ['cache', 'lock'])
         main(argv=argv + ['build'])
         main(argv=argv + ['test'])
+        main(argv=argv + ['list', '--packages-select-cache-modified'])
+        main(argv=argv + ['list', '--packages-select-cache-unmodified'])
+        main(argv=argv + ['list', '--packages-select-cache-invalid'])
+        main(argv=argv + ['list', '--packages-skip-cache-valid'])
         print('ws_base: ', ws_base)
     finally:
         # the logging subsystem might still have file handles pending
