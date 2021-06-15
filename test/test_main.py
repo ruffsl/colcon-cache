@@ -18,28 +18,28 @@ def test_main():
     os.chdir(ws_base)
     argv = []
 
-    try:
-        main(argv=argv + ['cache', 'lock'])
-        main(argv=argv + ['build'])
-        main(argv=argv + ['test'])
-        main(argv=argv + ['list', '--packages-select-cache-modified'])
-        main(argv=argv + ['list', '--packages-select-cache-unmodified'])
-        main(argv=argv + ['list', '--packages-select-cache-invalid'])
-        main(argv=argv + ['list', '--packages-skip-cache-valid'])
-        print('ws_base: ', ws_base)
-    finally:
-        # the logging subsystem might still have file handles pending
-        # therefore only try to delete the temporary directory
-        # shutil.rmtree(ws_base, ignore_errors=True)
-        pass
+    # try:
+    #     main(argv=argv + ['cache', 'lock'])
+    #     main(argv=argv + ['build'])
+    #     main(argv=argv + ['test'])
+    #     main(argv=argv + ['list', '--packages-select-cache-modified'])
+    #     main(argv=argv + ['list', '--packages-select-cache-unmodified'])
+    #     main(argv=argv + ['list', '--packages-select-cache-invalid'])
+    #     main(argv=argv + ['list', '--packages-skip-cache-valid'])
+    #     print('ws_base: ', ws_base)
+    # finally:
+    #     # the logging subsystem might still have file handles pending
+    #     # therefore only try to delete the temporary directory
+    #     # shutil.rmtree(ws_base, ignore_errors=True)
+    #     pass
 
-    shutil.rmtree(ws_base / 'build')
-    shutil.rmtree(ws_base / 'install')
-    shutil.rmtree(ws_base / 'log')
+    # shutil.rmtree(ws_base / 'build')
+    # shutil.rmtree(ws_base / 'install')
+    # shutil.rmtree(ws_base / 'log')
 
     repo = Repo.init(ws_base / 'src' / 'test-repo')
     repo.git.add(all=True)
-    repo.git.commit(message="initial commit")
+    repo.git.commit(message='initial commit')
 
     try:
         main(argv=argv + ['cache', 'lock'])
