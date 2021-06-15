@@ -27,6 +27,7 @@ jobs:
       run: |
         colcon build
         colcon test
+        colcon test-result --verbose
     - uses: actions/upload-artifact@v2
       with:
         name: coverage
