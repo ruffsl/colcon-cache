@@ -25,13 +25,8 @@ jobs:
         pip install -r src/colcon-cache/test/requirements.txt
     - name: Run tests
       run: |
-        colcon build --symlink-install
-        colcon test \
-          --pytest-args "--cov-report=term" \
-          --pytest-with-coverage
-        echo $(pwd)
-        tree .
-        mv build/colcon-cache/coverage.xml src/colcon-cache
+        colcon build
+        colcon test
     - uses: actions/upload-artifact@v2
       with:
         name: coverage
