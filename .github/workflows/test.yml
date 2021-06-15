@@ -1,10 +1,11 @@
 name: Test Workflow
-on: [pull_request, push]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 jobs:
   test:
-    if: |
-      github.event_name == 'push' ||
-      github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     strategy:
       matrix:
