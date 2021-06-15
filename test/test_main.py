@@ -38,10 +38,10 @@ def test_main():
     shutil.rmtree(ws_base / 'log')
 
     repo = Repo.init(ws_base / 'src' / 'test-repo')
-    repo.git.add(all=True)
-    repo.git.commit(message='initial commit')
     repo.config_writer().set_value('user', 'name', 'foo').release()
     repo.config_writer().set_value('user', 'email', 'bar').release()
+    repo.git.add(all=True)
+    repo.git.commit(message='initial commit')
 
     try:
         main(argv=argv + ['cache', 'lock'])
