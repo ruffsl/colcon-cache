@@ -1,4 +1,5 @@
 -r ../requirements.txt
+colcon-common-extensions
 flake8
 flake8-blind-except
 flake8-builtins
@@ -8,6 +9,7 @@ flake8-deprecated
 flake8-docstrings
 flake8-import-order
 flake8-quotes
+mock
 pep8-naming
 pylint
 pytest

@@ -38,13 +38,14 @@ class ModifiedPackageSelection(PackageSelectionExtensionPoint):
         )):
             return
 
+        if args.packages_select_cache_modified:
+            argument = '--packages-select-cache-modified'
+        elif args.packages_select_cache_unmodified:
+            argument = '--packages-select-cache-unmodified'
+        else:
+            assert False
+
         if not hasattr(args, 'build_base'):
-            if args.packages_select_cache_modified:
-                argument = '--packages-select-cache-modified'
-            elif args.packages_select_cache_unmodified:
-                argument = '--packages-select-cache-unmodified'
-            else:
-                assert False
             logger.warning(
                 "Ignoring '{argument}' since the invoked verb doesn't have a "
                 "'--build-base' argument and therefore can't access "
