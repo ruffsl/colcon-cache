@@ -1,5 +1,8 @@
 # colcon-cache
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ruffsl/colcon-cache/Test%20Workflow)
+![Codecov](https://img.shields.io/codecov/c/github/ruffsl/colcon-cache)
+
 An extension for [colcon-core](https://github.com/colcon/colcon-core) to cache packages for processing.
 
 ## Example usage
