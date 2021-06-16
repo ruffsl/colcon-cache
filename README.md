@@ -1,7 +1,7 @@
 # colcon-cache
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ruffsl/colcon-cache/Test%20Workflow)
-![Codecov](https://img.shields.io/codecov/c/github/ruffsl/colcon-cache)
+[![GitHub Workflow Status](https://github.com/ruffsl/colcon-cache/actions/workflows/test.yml/badge.svg)](https://github.com/ruffsl/colcon-cache/actions/workflows/test.yml)
+[![Codecov](https://codecov.io/gh/ruffsl/colcon-cache/branch/master/graph/badge.svg)](https://codecov.io/gh/ruffsl/colcon-cache)
 
 An extension for [colcon-core](https://github.com/colcon/colcon-core) to cache packages for processing.
 
