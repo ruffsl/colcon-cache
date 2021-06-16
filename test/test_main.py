@@ -64,11 +64,31 @@ def test_main():
 
         main(argv=argv + ['cache', 'lock'])
         main(argv=argv + ['build'])
+
+        main(argv=argv + [
+            'list',
+            '--packages-select-cache-invalid',
+            '--packages-select-cache-key', 'test'])
+        main(argv=argv + [
+            'list',
+            '--packages-skip-cache-valid',
+            '--packages-select-cache-key', 'test'])
+
         main(argv=argv + ['test'])
         main(argv=argv + ['list', '--packages-select-cache-modified'])
         main(argv=argv + ['list', '--packages-select-cache-unmodified'])
         main(argv=argv + ['list', '--packages-select-cache-invalid'])
         main(argv=argv + ['list', '--packages-skip-cache-valid'])
+
+        main(argv=argv + [
+            'list',
+            '--packages-select-cache-invalid',
+            '--packages-select-cache-key', 'test'])
+        main(argv=argv + [
+            'list',
+            '--packages-skip-cache-valid',
+            '--packages-select-cache-key', 'test'])
+
         print('ws_base: ', ws_base)
 
         test_file = \
@@ -84,16 +104,6 @@ def test_main():
         main(argv=argv + ['list', '--packages-skip-cache-valid'])
 
         main(argv=argv + ['build'])
-
-        main(argv=argv + [
-            'list',
-            '--packages-select-cache-invalid',
-            '--packages-select-cache-key', 'test'])
-        main(argv=argv + [
-            'list',
-            '--packages-skip-cache-valid',
-            '--packages-select-cache-key', 'test'])
-
         main(argv=argv + ['test'])
         main(argv=argv + ['test-result'])
 
