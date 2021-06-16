@@ -5,6 +5,29 @@
 
 An extension for [colcon-core](https://github.com/colcon/colcon-core) to cache packages for processing.
 
+## Subverbs
+
+### `lock` - Lock Package Cache
+
+## Package selection arguments
+
+
+
+## Extension points
+### VerbExtensionPoint
+### PackageAugmentationExtensionPoint
+#### DirhashPackageAugmentation
+#### GitPackageAugmentation
+### PackageSelectionExtensionPoint
+#### KeyPackageSelection
+#### ModifiedPackageSelection
+#### ValidPackageSelection
+### TaskExtensionPoint
+#### DirhashLockTask
+#### GitLockTask
+### EventHandlerExtensionPoint
+#### LockfileEventHandler
+
 ## Example usage
 
 Setup workspace:
