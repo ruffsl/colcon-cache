@@ -63,12 +63,12 @@ class DirhashLockTask(TaskExtensionPoint):
             'path matching. Paths relative to the root `directory` (i.e. '
             'excluding the name of the root directory itself) are matched '
             'against the provided patterns. For example, to only include '
-            'python source files, use: `dirhash path/to/dir -m "*.py"` or to '
-            'exclude hidden files and directories use: '
-            '`dirhash path/to.dir -i ".*" ".*/"` which is short for '
-            '`dirhash path/to.dir -m "*" "!.*" "!.*/"`. By adding the '
-            '--dirhash-list argument, all included paths, for the given '
-            'filtering arguments, are returned instead of the hash value. '
+            'python source files, use: '
+            '`colcon cache lock --dirhash-match "*.py"` '
+            'or to exclude hidden files and directories use: '
+            '`colcon cache lock --dirhash-ignore ".*" ".*/"` '
+            'which is short for '
+            '`colcon cache lock --dirhash-match "*" "!.*" "!.*/"`. '
             'For further details see '
             'https://github.com/andhus/dirhash/README.md#filtering'
         )
@@ -104,15 +104,16 @@ class DirhashLockTask(TaskExtensionPoint):
             '--dirhash-no-linked-dirs',
             dest='dirhash_linked_dirs',
             action='store_false',
+            default=True,
             help='Do not include symbolic links to other directories.'
         )
         filter_options.add_argument(
             '--dirhash-no-linked-files',
             dest='dirhash_linked_files',
             action='store_false',
+            default=True,
             help='Do not include symbolic links to files.'
         )
-        parser.set_defaults(linked_dirs=True, linked_files=True)
 
         protocol_options = parser.add_argument_group(
             title='Protocol options',
