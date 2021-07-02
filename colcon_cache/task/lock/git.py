@@ -94,7 +94,10 @@ class GitLockTask(TaskExtensionPoint):
         if args.git_reference_revision is None:
             reference_commit = repo.commit()
         else:
-            reference_commit = repo.commit(args.git_reference_revision)
+            try:
+                reference_commit = repo.commit(args.git_reference_revision)
+            except ValueError:
+                reference_commit = repo.commit()
         lockfile.metadata['reference_revision'] = reference_commit.hexsha
 
         diff_args = []
