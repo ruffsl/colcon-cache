@@ -51,9 +51,20 @@ class GitLockTask(TaskExtensionPoint):
             '--git-reference-revision',
             type=str, default=None,
             help=(
-                'Optional choose revision used as a reference. If unset, '
+                'Optionally specify revision used as a reference. If unset, '
                 'the reference from the previous lockfile will be reused. '
-                'If nether provide references, revision defaults to HEAD.'
+                'If nether provide references, the fallback will be used.'
+                ' View docs for info: https://git-scm.com/docs/gitrevisions'
+                )
+            )
+
+        parser.add_argument(
+            '--git-reference-fallback',
+            type=str, default='HEAD',
+            help=(
+                'Override fallback revision used as a reference. If nether '
+                'the user and the previous lockfile specify a revision, or '
+                'if reference is unresolvable, this fallback will be used.'
                 ' View docs for info: https://git-scm.com/docs/gitrevisions'
                 )
             )
@@ -91,13 +102,13 @@ class GitLockTask(TaskExtensionPoint):
     def compute_current_checksums(self, args, lockfile):  # noqa: D102
         repo = Repo(args.path, search_parent_directories=True)
 
-        if args.git_reference_revision is None:
-            reference_commit = repo.commit()
-        else:
+        reference_commit = repo.commit(args.git_reference_fallback)
+        if args.git_reference_revision:
             try:
                 reference_commit = repo.commit(args.git_reference_revision)
             except ValueError:
-                reference_commit = repo.commit()
+                pass
+
         lockfile.metadata['reference_revision'] = reference_commit.hexsha
 
         diff_args = []
