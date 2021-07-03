@@ -2,6 +2,7 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+from contextlib import suppress
 import hashlib
 from pathlib import Path
 
@@ -104,10 +105,8 @@ class GitLockTask(TaskExtensionPoint):
 
         reference_commit = repo.commit(args.git_reference_fallback)
         if args.git_reference_revision:
-            try:
+            with suppress(ValueError):
                 reference_commit = repo.commit(args.git_reference_revision)
-            except ValueError:
-                pass
 
         lockfile.metadata['reference_revision'] = reference_commit.hexsha
 
