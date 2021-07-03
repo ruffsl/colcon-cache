@@ -54,8 +54,12 @@ def test_main():
     repo.git.commit(message='initial commit')
 
     try:
-        main(argv=argv + ['cache', 'lock'])
-        main(argv=argv + ['cache', 'lock', '--git-reference-revision=HEAD'])
+        main(argv=argv +
+             ['cache', 'lock'])
+        main(argv=argv +
+             ['cache', 'lock', '--git-reference-revision=HEAD'])
+        main(argv=argv +
+             ['cache', 'lock', '--git-reference-revision=unresolvable'])
 
         test_file = \
             ws_base / 'src' / 'test-repo' / 'test-package-b' / 'setup.py'
