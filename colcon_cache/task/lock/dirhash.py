@@ -33,10 +33,10 @@ class DirhashLockTask(TaskExtensionPoint):
         modifier_group = parser.add_mutually_exclusive_group()
         modifier_group.add_argument(
             '--dirhash-ratchet', action='store_true',
-            help='Ratchet refrence checksum from previous value')
+            help='Ratchet reference checksum from previous value')
         modifier_group.add_argument(
             '--dirhash-reset', action='store_true',
-            help='Reset refrence checksum to current value')
+            help='Reset reference checksum to current value')
 
         parser.add_argument(
             '--dirhash-algorithm',
