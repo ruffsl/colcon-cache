@@ -44,16 +44,17 @@ colcon test --packages-skip-cache-valid
 
 ### `lock` - Lock Package Cache
 
-The `lock` subverb generates or updates lockfiles for selected packages by capturing the current state of package source files. The subverb provides basic arguments to change the build base path where lockfiles are recorded, as well the option to ignore dependencies when capturing package state. More advance arguments specific lock tasks used to capture the package state are also provided.
+The `lock` subverb generates or updates lockfiles for selected packages by capturing the current state of package source files. The subverb provides basic arguments to change the build base path where lockfiles are recorded, as well the option to ignore dependencies when capturing package state. More advance arguments specific `lock` tasks used to capture the package state are also provided.
 
 - `--build-base`
   - The base path for all build directories (default: build)
 - `--ignore-dependencies`
   - Ignore dependencies when capturing caches (default: false)
 
+
 ## Package Selection
 
-This extension provides additional package selection arguments that can filter by modified package source or by validity of workspace cache with respect the most recent invocation of lock subverb. By default, the  internal cache key is selected by the colcon verb that invokes the package selection arguments, but can be manually overridden.
+This extension provides additional package selection arguments that can filter by modified package source or by validity of workspace cache with respect the most recent invocation of the `lock` subverb. By default, the  internal cache key is selected by the colcon verb that invokes the package selection arguments, but can be manually overridden.
 
 - `--packages-select-cache-key`
   - Only process packages using considered cache key. Fallbacks using invoked verb handler if unspecified.
@@ -76,17 +77,122 @@ Check if the `current` checksum in the cached lockfile matches the `current` che
 - `--packages-skip-cache-valid`
   - Skip a set of packages with a valid cache (packages without a reference cache are not considered)
 
+
 ## Extension points
-### VerbExtensionPoint
-### PackageAugmentationExtensionPoint
-#### DirhashPackageAugmentation
-#### GitPackageAugmentation
-### PackageSelectionExtensionPoint
-#### KeyPackageSelection
-#### ModifiedPackageSelection
-#### ValidPackageSelection
-### TaskExtensionPoint
-#### DirhashLockTask
-#### GitLockTask
-### EventHandlerExtensionPoint
-#### LockfileEventHandler
+
+This extension makes use of a number of colcon-core extension points for registering verbs, subverbs, and package selection arguments with colcon CLI, an event handler to update lockfiles for successful jobs, as well auto detect revision control with package augmentation. This extension also provides a number of it's own extension points for additional support of alternative revision control systems or package caching strategies.
+
+### `VerbExtensionPoint`
+
+This extension point determines how lockfiles are propagated for jobs invoked by a given verb. As tasks may or may not require perquisite processing, this extension point provides the means to express the relational provenance of cached artifacts generated when using colcon. The default verb extensions provided include:
+
+- `cache`
+  - Do not propagate lockfile, as only the `lock` subverb updates this
+- `list`
+  - Do not propagate lockfile, using `cache` lockfile as a reference
+- `build`
+  - Propagate lockfile, using `cache` lockfile as a reference
+- `test`
+  - Propagate lockfile, using `build` lockfile as a reference
+
+### `PackageAugmentationExtensionPoint`
+
+This extension point determines if or what revision control is in effect for package source files.
+
+- `DirhashPackageAugmentation`
+  - If no revision control is detected by any other package augmentation extension, this extension modifies the package's metadata to use the dirhash task extension for the `lock` subverb by default.
+- `GitPackageAugmentation`
+  - If git revision control is detected, this extension modifies the package's metadata to use the git task extension for the `lock` subverb.
+
+### `TaskExtensionPoint`
+
+This extension point determines how lockfiles are derived, given the package's revision control.
+
+#### `DirhashLockTask`
+
+This extension derives the lockfile by computing the hash the package source files using [Dirhash](https://github.com/andhus/dirhash-python). While most Dirhash options are exposed, such as customizing match and ignore expressions for hashed file paths in include dot files (ignored by default), several specific arguments provide control in updating the reference checksum for a package's lockfile.
+
+- `--dirhash-ratchet`
+  - Ratchet reference checksum from previous value
+- `--dirhash-reset`
+  - Reset reference checksum to current value
+
+```
+Arguments for 'dirhash' packages:
+  --dirhash-ratchet     Ratchet reference checksum from previous value
+  --dirhash-reset       Reset reference checksum to current value
+  --dirhash-algorithm   Hashing algorithm to use, by default "md5". Always
+                        available: ['md5', 'sha1', 'sha224', 'sha256',
+                        'sha384', 'sha512']. Additionally available on current
+                        platform: ['blake2b', 'blake2s', 'md4', 'md5-sha1',
+                        'ripemd160', 'sha3_224', 'sha3_256', 'sha3_384',
+                        'sha3_512', 'sha512_224', 'sha512_256', 'shake_128',
+                        'shake_256', 'sm3', 'whirlpool']. Note that the same
+                        algorithm may appear multiple times in this set under
+                        different names (thanks to OpenSSL)
+                        [https://docs.python.org/2/library/hashlib.html]
+  --dirhash-match  [ ...]
+                        One or several patterns for paths to include. NOTE:
+                        patterns with an asterisk must be in quotes ("*") or
+                        the asterisk preceded by an escape character (\*).
+  --dirhash-ignore  [ ...]
+                        One or several patterns for paths to exclude. NOTE:
+                        patterns with an asterisk must be in quotes ("*") or
+                        the asterisk preceded by an escape character (\*).
+  --dirhash-empty-dirs  Include empty directories (containing no files that
+                        meet the matching criteria and no non-empty sub
+                        directories).
+  --dirhash-no-linked-dirs
+                        Do not include symbolic links to other directories.
+  --dirhash-no-linked-files
+                        Do not include symbolic links to files.
+  --dirhash-properties  [ ...]
+                        List of file/directory properties to include in the
+                        hash. Available properties are: ['is_link', 'data',
+                        'name'] and at least one of name and data must be
+                        included. Default is [data name] which means that both
+                        the name/paths and content (actual data) of files and
+                        directories will be included.
+  --dirhash-allow-cyclic-links
+                        Allow presence of cyclic links (by hashing the
+                        relative path to the target directory).
+  --dirhash-chunk-size DIRHASH_CHUNK_SIZE
+                        The chunk size (in bytes) for reading of files.
+  --dirhash-jobs DIRHASH_JOBS
+                        Number of jobs (parallel processes) to use.
+```
+
+#### `GitLockTask`
+
+This extension derives the lockfile by computing the hash of tracked source files using [Git](https://git-scm.com). Several specific arguments provide control in specifying the reference revision and fallback used for diffing the package source file when computing the `current` hash for a package lockfile. This not only enables tracking of package source files with respect the most recent invocation of the `lock` subverb, but also with respect to a particular git branch, tag or commit. The default match criteria for diff filter comparison can also be overridden.
+
+```
+Arguments for 'git' packages:
+  --git-diff-filter GIT_DIFF_FILTER
+                        Select only files that are Added (A), Copied (C),
+                        Deleted (D), Modified (M), Renamed (R), have their
+                        type (i.e. regular file, symlink, submodule, …​)
+                        changed (T), are Unmerged (U), are Unknown (X), or
+                        have had their pairing Broken (B). Any combination of
+                        the filter characters (including none) can be used.
+                        When * (All-or-none) is added to the combination, all
+                        paths are selected if there is any file that matches
+                        other criteria in the comparison; if there is no file
+                        that matches other criteria, nothing is selected.
+                        Also, these upper-case letters can be downcased to
+                        exclude. View docs for info:
+                        https://git-scm.com/docs/git-diff#Documentation/
+                        git-diff.txt---diff-filterACDMRTUXB82308203
+  --git-reference-revision GIT_REFERENCE_REVISION
+                        Optionally specify revision used as a reference. If
+                        unset, the reference from the previous lockfile will
+                        be reused. If nether provide references, the fallback
+                        will be used. View docs for info:
+                        https://git-scm.com/docs/gitrevisions
+  --git-reference-fallback GIT_REFERENCE_FALLBACK
+                        Override fallback revision used as a reference. If
+                        nether the user and the previous lockfile specify a
+                        revision, or if reference is unresolvable, this
+                        fallback will be used. View docs for info:
+                        https://git-scm.com/docs/gitrevisions
+```
