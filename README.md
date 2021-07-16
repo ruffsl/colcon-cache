@@ -9,6 +9,37 @@ Enables caching of various colcon tasks, such as building or testing packages, b
 
 The extension works by generating lockfiles that incorporate the respective state of package source files, either directly via hashing source directories or indirectly via detected revision control. Upon successful task completion for a package job, as when evoking colcon verbs like build, test, etc, these lockfiles are updated for the evoked verb, thereby delineating the provenance of the job’s results. For package selection, these lockfiles are then used to assess whether a verb’s cached outcome for a package remains relevant or valid.
 
+
+## Quick start
+
+Setup an example colcon workspace:
+```
+mkdir -p ~/ws/src && cd ~/ws
+wget https://raw.githubusercontent.com/colcon/colcon.readthedocs.org/main/colcon.repos
+vcs import src < colcon.repos
+```
+
+First lock cache, then build and test workspace:
+```
+colcon cache lock
+colcon build
+colcon test
+```
+
+Modify workspace packages, then update cache lockfiles:
+```
+echo "#foo" >> src/colcon-cmake/setup.py
+echo "#bar" >> src/colcon-package-information/setup.py
+colcon cache lock
+```
+
+Rebuild and retest, skipping packages with valid cache:
+```
+colcon build --packages-skip-cache-valid
+colcon test --packages-skip-cache-valid
+```
+
+
 ## Subverbs
 
 ### `lock` - Lock Package Cache
@@ -59,69 +90,3 @@ Check if the `current` checksum in the cached lockfile matches the `current` che
 #### GitLockTask
 ### EventHandlerExtensionPoint
 #### LockfileEventHandler
-
-## Example usage
-
-Setup workspace:
-```
-mkdir -p ~/ws/src && cd ~/ws
-wget https://raw.githubusercontent.com/colcon/colcon.readthedocs.org/main/colcon.repos
-vcs import src < colcon.repos
-```
-
-Lock workspace by generating `cache` lockfiles:
-```
-colcon cache lock
-```
-
-Build and test workspace:
-```
-colcon build
-colcon test
-```
-
-Modify package source:
-```
-echo "#foo" >> src/colcon-cmake/setup.py
-```
-
-Update `cache` lockfiles:
-```
-colcon cache lock
-```
-
-List modified packges by comparing `cache` lockfile checksums
-```
-PKGS_MODIFIED=$(colcon list --packages-select-cache-modified | xarg)
-```
-
-Rebuild only modified packages and above:
-```
-colcon build --packages-above $PKGS_MODIFIED
-```
-
-Modify package source again:
-```
-echo "#bar" >> src/colcon-cmake/setup.py
-echo "#baz" >> src/colcon-package-information/setup.py
-```
-
-Update cache lockfiles again:
-```
-colcon cache lock
-```
-
-Rebuild by skipping packages with valid `build` lockfiles:
-```
-colcon build --packages-skip-cache-valid
-```
-
-Retest by skipping packages with valid `test` lockfiles:
-```
-colcon test --packages-skip-cache-valid
-```
-
-List generated lockfiles from each `verb`:
-```
-ls build/colcon-cmake/cache
-```
