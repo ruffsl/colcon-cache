@@ -5,7 +5,10 @@
     "python.linting.pycodestyleEnabled": true,
     "cSpell.words": [
         "CPUs",
+        "lockfiles",
         "noqa",
-        "sched"
+        "sched",
+        "subverb",
+        "subverbs"
     ]
 }

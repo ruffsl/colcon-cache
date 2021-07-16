@@ -30,7 +30,6 @@ noqa
 pathlib
 plugin
 pytest
-refrence
 rmtree
 rtype
 scspell
