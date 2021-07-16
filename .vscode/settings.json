@@ -8,6 +8,7 @@
         "lockfiles",
         "noqa",
         "sched",
-        "subverb"
+        "subverb",
+        "subverbs"
     ]
 }
