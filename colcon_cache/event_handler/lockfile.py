@@ -40,11 +40,10 @@ class LockfileEventHandler(EventHandlerExtensionPoint):
             verb_name = self.context.args.verb_name
             verb_handler_extensions = get_verb_handler_extensions()
 
-            if verb_name in verb_handler_extensions:
-                verb_handler_extension = verb_handler_extensions[verb_name]
-            else:
+            if verb_name not in verb_handler_extensions:
                 return
 
+            verb_handler_extension = verb_handler_extensions[verb_name]
             lockfile = verb_handler_extension.get_job_lockfile(job)
 
             if job in self._test_failures:
