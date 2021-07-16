@@ -5,7 +5,7 @@
 
 An extension for [colcon-core](https://github.com/colcon/colcon-core) to cache the processing of packages.
 
-Enables caching of various colcon tasks, such as building or testing packages, by associating successful jobs with the respective state of package source files. In conjunction with [colcon-package-selection](https://github.com/colcon/colcon-package-selection), this extension can accelerate developer or continuous integration workflows by allowing users to finely cache valid workspace artifacts and skip processing of unaltered or unaffected packages during software development. For example, when pulling various changes into an local workspace to review pull requests, this extension can be used to track which packages need to be rebuilt or retested, maximizing the caching of the existing artifacts.
+Enables caching of various colcon tasks, such as building or testing packages, by associating successful jobs with the respective state of package source files. In conjunction with [colcon-package-selection](https://github.com/colcon/colcon-package-selection), this extension can accelerate developer or continuous integration workflows by allowing users to finely cache valid workspace artifacts and skip processing of unaltered or unaffected packages during software development. For example, when pulling various changes into a local workspace to review pull requests, this extension can be used to track which packages need to be rebuilt or retested, maximizing the caching of the existing artifacts.
 
 The extension works by generating lockfiles that incorporate the respective state of package source files, either directly via hashing source directories or indirectly via detected revision control. Upon successful task completion for a package job, as when evoking colcon verbs like build, test, etc, these lockfiles are updated for the evoked verb, thereby delineating the provenance of the job’s results. For package selection, these lockfiles are then used to assess whether a verb’s cached outcome for a package remains relevant or valid.
 
@@ -44,7 +44,7 @@ colcon test --packages-skip-cache-valid
 
 ### `lock` - Lock Package Cache
 
-The `lock` subverb generates or updates lockfiles for selected packages by capturing the current state of package source files. The subverb provides basic arguments to change the build base path where lockfiles are recorded, as well the option to ignore dependencies when capturing package state. More advance arguments specific `lock` tasks used to capture the package state are also provided.
+The `lock` subverb generates or updates lockfiles for selected packages by capturing the current state of package source files. The subverb provides basic arguments to change the build base path where lockfiles are recorded, as well as the option to ignore dependencies when capturing package state. More advance arguments specific `lock` tasks used to capture the package state include:
 
 - `--build-base`
   - The base path for all build directories (default: build)
@@ -54,14 +54,14 @@ The `lock` subverb generates or updates lockfiles for selected packages by captu
 
 ## Package Selection
 
-This extension provides additional package selection arguments that can filter by modified package source or by validity of workspace cache with respect the most recent invocation of the `lock` subverb. By default, the  internal cache key is selected by the colcon verb that invokes the package selection arguments, but can be manually overridden.
+This extension provides additional package selection arguments that can filter by modified package source or by validity of workspace cache with respect to the most recent invocation of the `lock` subverb. By default, the  internal cache key is selected by the colcon verb that invokes the package selection argument, but can be manually overridden:
 
 - `--packages-select-cache-key`
   - Only process packages using considered cache key. Fallbacks using invoked verb handler if unspecified.
 
 ### Modified Package Selection
 
-Check if the `current` checksum in a package's lockfile is matches it's `reference` checksum.
+Check if the `current` checksum in a package's lockfile matches it's `reference` checksum.
 
 - `--packages-select-cache-modified`
   - Only process a subset of packages whose cache denote package modifications (packages without lockfiles are not considered as modified)
@@ -70,7 +70,7 @@ Check if the `current` checksum in a package's lockfile is matches it's `referen
 
 ### Valid Package Selection
 
-Check if the `current` checksum in the cached lockfile matches the `current` checksum in a package's lockfile.
+Check if the `current` checksum in the verb's lockfile matches that in the package's lockfile.
 
 - `--packages-select-cache-invalid`
   - Only process a subset of packages with an invalid cache (packages without a reference cache are not considered)
@@ -84,10 +84,10 @@ This extension makes use of a number of colcon-core extension points for registe
 
 ### `VerbExtensionPoint`
 
-This extension point determines how lockfiles are propagated for jobs invoked by a given verb. As tasks may or may not require perquisite processing, this extension point provides the means to express the relational provenance of cached artifacts generated when using colcon. The default verb extensions provided include:
+This extension point determines how lockfiles are propagated for jobs invoked by a given verb. As tasks may or may not require prerequisite processing, this extension point provides the means to express the relational provenance of cached artifacts generated when using colcon. Default verb extensions provided include:
 
 - `cache`
-  - Do not propagate lockfile, as only the `lock` subverb updates this
+  - Do not propagate lockfile, as `lock` subverb handles this explicitly
 - `list`
   - Do not propagate lockfile, using `cache` lockfile as a reference
 - `build`
@@ -97,20 +97,20 @@ This extension point determines how lockfiles are propagated for jobs invoked by
 
 ### `PackageAugmentationExtensionPoint`
 
-This extension point determines if or what revision control is in effect for package source files.
+This extension point determines if or what revision control is in effect for package source files, modifying the package's metadata to use the appropriate task extension for the `lock` subverb.
 
 - `DirhashPackageAugmentation`
-  - If no revision control is detected by any other package augmentation extension, this extension modifies the package's metadata to use the dirhash task extension for the `lock` subverb by default.
+  - If no revision control is detected, the default dirhash extension is configured.
 - `GitPackageAugmentation`
-  - If git revision control is detected, this extension modifies the package's metadata to use the git task extension for the `lock` subverb.
+  - If git revision control is detected via a git repo, the git extension is configured.
 
 ### `TaskExtensionPoint`
 
-This extension point determines how lockfiles are derived, given the package's revision control.
+This extension point determines how lockfiles are derived, given the package's detected revision control.
 
 #### `DirhashLockTask`
 
-This extension derives the lockfile by computing the hash the package source files using [Dirhash](https://github.com/andhus/dirhash-python). While most Dirhash options are exposed, such as customizing match and ignore expressions for hashed file paths in include dot files (ignored by default), several specific arguments provide control in updating the reference checksum for a package's lockfile.
+This extension derives the lockfile by computing the hash of package source files using [Dirhash](https://github.com/andhus/dirhash-python). While most Dirhash options are exposed, such as customizing match and ignore expressions to include dot file paths (ignored by default), several specific arguments provide control in updating the `reference` checksum for a package's lockfile.
 
 - `--dirhash-ratchet`
   - Ratchet reference checksum from previous value
@@ -164,7 +164,7 @@ Arguments for 'dirhash' packages:
 
 #### `GitLockTask`
 
-This extension derives the lockfile by computing the hash of tracked source files using [Git](https://git-scm.com). Several specific arguments provide control in specifying the reference revision and fallback used for diffing the package source file when computing the `current` hash for a package lockfile. This not only enables tracking of package source files with respect the most recent invocation of the `lock` subverb, but also with respect to a particular git branch, tag or commit. The default match criteria for diff filter comparison can also be overridden.
+This extension derives the lockfile by computing the hash of tracked source files using [Git](https://git-scm.com). Several specific arguments provide control in specifying the reference revision and fallback used for diffing the package source file when computing the `current` hash for a package lockfile. This not only enables tracking of package source files with respect to the most recent invocation of the `lock` subverb, but also with respect to a particular git branch, tag or commit. The default match criteria for the diff filter comparison can also be overridden.
 
 ```
 Arguments for 'git' packages:
