@@ -124,5 +124,5 @@ class GitLockTask(TaskExtensionPoint):
         lockfile.checksums.reference = h.hexdigest()
 
         if diff:
-            h.update(diff.encode('utf-8'))
+            h.update(diff)
         lockfile.checksums.current = h.hexdigest()
