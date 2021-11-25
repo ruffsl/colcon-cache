@@ -119,7 +119,7 @@ class GitLockTask(TaskExtensionPoint):
 
         diff = reference_commit.diff(None, paths=[args.path])
         if diff:
-            for change_type in sorted(list(args.git_diff_filter)):
+            for change_type in sorted(args.git_diff_filter):
                 for change in diff.iter_change_type(change_type):
                     h.update(change.change_type.encode('utf-8'))
                     h.update(change.a_path.encode('utf-8'))
