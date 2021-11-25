@@ -100,6 +100,10 @@ def test_main():
         with open(test_file, 'w') as f:
             f.write('def test_empty():\n    assert False\n')
 
+        test_file = \
+            ws_base / 'src' / 'test-repo' / 'test-package-c' / 'trash.txt'
+        os.remove(test_file)
+
         main(argv=argv + ['cache', 'lock'])
 
         main(argv=argv + ['list', '--packages-select-cache-modified'])

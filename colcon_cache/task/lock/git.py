@@ -110,12 +110,6 @@ class GitLockTask(TaskExtensionPoint):
 
         lockfile.metadata['reference_revision'] = reference_commit.hexsha
 
-        diff_args = []
-        diff_args.append('--diff-filter={}'.format(args.git_diff_filter))
-        diff_args.append(reference_commit.hexsha)
-        diff_args.append(args.path)
-        diff = repo.git.diff(diff_args)
-
         h = hashlib.sha1()
         for _, checksum in lockfile.dependencies.items():
             h.update(bytes.fromhex(checksum))
@@ -123,6 +117,14 @@ class GitLockTask(TaskExtensionPoint):
         h.update(bytes.fromhex(reference_commit.hexsha))
         lockfile.checksums.reference = h.hexdigest()
 
+        diff = reference_commit.diff(None, paths=[args.path])
         if diff:
-            h.update(diff.encode('utf-8'))
+            for change_type in sorted(args.git_diff_filter):
+                for change in diff.iter_change_type(change_type):
+                    h.update(change.change_type.encode('utf-8'))
+                    h.update(change.a_path.encode('utf-8'))
+                    h.update(change.b_path.encode('utf-8'))
+                    if not change.deleted_file:
+                        hash_object = repo.git.hash_object(change.b_path)
+                        h.update(bytes.fromhex(hash_object))
         lockfile.checksums.current = h.hexdigest()
