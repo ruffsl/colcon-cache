@@ -1,37 +1,37 @@
-name: Test Workflow
+name: Run tests
+
 on:
-  pull_request:
   push:
-    branches:
-      - master
+    branches: ['master']
+  pull_request:
+
 jobs:
-  test:
+  setup:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # python-version: [3.6, 3.7, 3.8]
-        python-version: [3.8]
+    outputs:
+      strategy: ${{steps.load.outputs.strategy}}
+
     steps:
-    - uses: actions/checkout@v2
-      with:
-        path: src/colcon-cache
-    - uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip'
-        cache-dependency-path: '**/requirements.txt'
-    - name: Install dependencies
-      working-directory: src/colcon-cache
-      run: |
-        pip install -r test/requirements.txt
-    - name: Run tests
-      run: |
-        colcon build
-        colcon test
-        colcon test-result --verbose
-    - uses: actions/upload-artifact@v2
-      with:
-        name: coverage
-        path: ./**/coverage.xml
-    - uses: codecov/codecov-action@v1
-      if: always()
+      - uses: actions/checkout@v2
+        with:
+          repository: colcon/ci
+      - id: load
+        run: echo "::set-output name=strategy::$(echo $(cat strategy.json))"
+
+  pytest:
+    needs: [setup]
+    strategy: ${{fromJson(needs.setup.outputs.strategy)}}
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{matrix.python}}
+      - uses: colcon/ci@v1
+      - uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: ./**/coverage.xml
+      - uses: codecov/codecov-action@v1
+        if: always()
