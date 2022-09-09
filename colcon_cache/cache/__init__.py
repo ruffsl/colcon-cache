@@ -42,19 +42,19 @@ class CacheLockfile:
         self.lock_type = lock_type
 
         if checksums:
-            assert(isinstance(checksums, CacheChecksums))
+            assert (isinstance(checksums, CacheChecksums))
             self.checksums = checksums
         else:
             self.checksums = CacheChecksums()
 
         if dependencies:
-            assert(isinstance(dependencies, dict))
+            assert (isinstance(dependencies, dict))
             self.dependencies = dependencies
         else:
             self.dependencies = {}
 
         if metadata:
-            assert(isinstance(metadata, dict))
+            assert (isinstance(metadata, dict))
             self.metadata = metadata
         else:
             self.metadata = {}
