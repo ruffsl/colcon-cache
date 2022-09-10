@@ -17,6 +17,9 @@ def test_main():
 
     os.chdir(ws_base)
     argv = []
+    os.environ['COLCON_EXTENSION_BLOCKLIST'] = (
+        'colcon_core.event_handler.desktop_notification:' +
+        os.environ.get('COLCON_EXTENSION_BLOCKLIST', ''))
 
     try:
         main(argv=argv + ['build'])
