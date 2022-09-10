@@ -45,7 +45,7 @@ def test_main():
 
     shutil.rmtree(ws_base / 'build')
     shutil.rmtree(ws_base / 'install')
-    shutil.rmtree(ws_base / 'log')
+    # shutil.rmtree(ws_base / 'log')
 
     repo = Repo.init(ws_base / 'src' / 'test-repo')
     repo.config_writer().set_value('user', 'name', 'foo').release()
