@@ -1,6 +1,6 @@
 # colcon-cache
 
-[![GitHub Workflow Status](https://github.com/ruffsl/colcon-cache/actions/workflows/test.yml/badge.svg)](https://github.com/ruffsl/colcon-cache/actions/workflows/test.yml)
+[![GitHub Workflow Status](https://github.com/ruffsl/colcon-cache/actions/workflows/ci.yaml/badge.svg)](https://github.com/ruffsl/colcon-cache/actions/workflows/ci.yaml)
 [![Codecov](https://codecov.io/gh/ruffsl/colcon-cache/branch/master/graph/badge.svg)](https://codecov.io/gh/ruffsl/colcon-cache)
 
 An extension for [colcon-core](https://github.com/colcon/colcon-core) to cache the processing of packages. Enables caching of various colcon tasks, such as building or testing packages, by associating successful jobs with the respective state of package source files. In conjunction with [colcon-package-selection](https://github.com/colcon/colcon-package-selection), this extension can accelerate developer or continuous integration workflows by allowing users to finely cache valid workspace artifacts and skip processing of unaltered or unaffected packages during software development. For example, when pulling various changes into a local workspace to review pull requests, this extension can be used to track which packages need to be rebuilt or retested, maximizing the caching of the existing artifacts.
