@@ -1,3 +1,0 @@
-colcon-core
-dirhash
-GitPython
