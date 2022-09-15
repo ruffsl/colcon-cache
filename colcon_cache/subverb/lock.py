@@ -51,12 +51,12 @@ class LockCachePackageArguments:
         # set additional arguments
         for dest in (additional_destinations or []):
             # from the command line
-            if hasattr(args, dest):
+            if hasattr(args, dest):  # pragma: no branch
                 update_object(
                     self, dest, getattr(args, dest),
                     pkg.name, 'cache lock', 'command line')
             # from the package metadata
-            if dest in pkg.metadata:
+            if dest in pkg.metadata:  # pragma: no cover
                 update_object(
                     self, dest, pkg.metadata[dest],
                     pkg.name, 'cache lock', 'package metadata')
@@ -121,7 +121,7 @@ class LockCacheSubverb(CacheSubverbExtensionPoint):
 
     def _create_path(self, path):
         path = Path(os.path.abspath(path))
-        if not path.exists():
+        if not path.exists():  # pragma: no cover
             path.mkdir(parents=True, exist_ok=True)
         ignore_marker = path / IGNORE_MARKER
         if not os.path.lexists(str(ignore_marker)):
@@ -140,7 +140,7 @@ class LockCacheSubverb(CacheSubverbExtensionPoint):
 
             extension = get_task_extension(
                 'colcon_cache.task.lock', pkg.metadata['vcs_type'])
-            if not extension:
+            if not extension:  # pragma: no cover
                 logger.warning(
                     "No task extension to 'cache lock' "
                     "a '{pkg.type}' package"

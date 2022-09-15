@@ -40,7 +40,7 @@ class LockfileEventHandler(EventHandlerExtensionPoint):
             verb_name = self.context.args.verb_name
             verb_handler_extensions = get_verb_handler_extensions()
 
-            if verb_name not in verb_handler_extensions:
+            if verb_name not in verb_handler_extensions:  # pragma: no cover
                 return
 
             verb_handler_extension = verb_handler_extensions[verb_name]
