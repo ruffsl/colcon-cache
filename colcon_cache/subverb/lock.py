@@ -121,7 +121,7 @@ class LockCacheSubverb(CacheSubverbExtensionPoint):
 
     def _create_path(self, path):
         path = Path(os.path.abspath(path))
-        if not path.exists():
+        if not path.exists():  # pragma: no cover
             path.mkdir(parents=True, exist_ok=True)
         ignore_marker = path / IGNORE_MARKER
         if not os.path.lexists(str(ignore_marker)):
