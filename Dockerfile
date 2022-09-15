@@ -1,12 +1,14 @@
-FROM python:3.8
+FROM python:3
 
-WORKDIR /usr/src/colcon-cache
+WORKDIR /usr/src/app
 
-COPY requirements.txt .
-COPY test/requirements.txt ./test/
-RUN pip install -r test/requirements.txt
+COPY setup.cfg setup.py ./
+COPY colcon_cache/__init__.py ./colcon_cache/__init__.py
+RUN pip install -e .[test]
 
 COPY . .
+RUN pip install -e .[test]
+
 RUN colcon build \
         --symlink-install
 
