@@ -21,10 +21,21 @@ class VerbHandlerExtensionPoint:
     """The version of the package selection extension interface."""
     EXTENSION_POINT_VERSION = '1.0'
 
-    def __init__(self, verb_name, reference_name):  # noqa: D107
+    def __init__(self, base_path, verb_name, reference_name):  # noqa: D107
         # TODO: find better alternative than perhaps using params
+        self.base_path = base_path
         self.verb_name = verb_name
         self.reference_name = reference_name
+
+    def add_arguments(self, *, parser):
+        """
+        Add command line arguments specific to the workspace base.
+
+        This method must be overridden in a subclass.
+
+        :param parser: The argument parser
+        """
+        raise NotImplementedError()
 
     def get_current_lockfile(self, package_build_base):
         """
@@ -58,6 +69,20 @@ class VerbHandlerExtensionPoint:
         :returns: A lockfile, or None
         """
         return self.get_reference_lockfile(job.task_context.args.build_base)
+
+
+def add_verb_handler_arguments(parser):
+    """
+    Add the command line arguments for the verb handler extensions.
+
+    :param parser: The argument parser
+    """
+    group = parser.add_argument_group(title='Verb handler arguments')
+    extensions = get_verb_handler_extensions()
+
+    for key in sorted(extensions.keys()):
+        extension = extensions[key]
+        extension.add_arguments(parser=group)
 
 
 def get_verb_handler_extensions():
