@@ -43,14 +43,6 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
         else:
             assert False
 
-        if not hasattr(args, 'build_base'):
-            logger.warning(
-                "Ignoring '{argument}' since the invoked verb doesn't have a "
-                "'--build-base' argument and therefore can't access "
-                'information about the relative state of a package'
-                .format_map(locals()))
-            return
-
         verb_name = args.packages_select_cache_key
         if not verb_name:
             verb_name = args.verb_name
