@@ -2,6 +2,8 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+import os
+
 from colcon_cache.event_handler import get_previous_lockfile
 from colcon_core.plugin_system import instantiate_extensions
 from colcon_core.plugin_system import order_extensions_by_name
@@ -37,27 +39,35 @@ class VerbHandlerExtensionPoint:
         """
         raise NotImplementedError()
 
-    def get_current_lockfile(self, package_build_base):
+    def get_current_lockfile(self, args, pkg_name):
         """
         Get current lockfile for verb.
 
         This method can be overridden in a subclass.
 
-        :param package_build_base: Base build path for package
+        :param args: Args with respective base path
+        :param pkg_name: Name for package
         :returns: A lockfile, or None
         """
-        return get_previous_lockfile(package_build_base, self.verb_name)
+        reference_base_path = getattr(args, self.reference_name + '_base')
+        package_reference_base = os.path.join(reference_base_path, pkg_name)
+        return get_previous_lockfile(
+            package_reference_base, self.verb_name)
 
-    def get_reference_lockfile(self, package_build_base):
+    def get_reference_lockfile(self, args, pkg_name):
         """
         Get reference lockfile for verb.
 
         This method can be overridden in a subclass.
 
-        :param package_build_base: Base build path for package
+        :param args: Args with respective base path
+        :param pkg_name: Name for package
         :returns: A lockfile, or None
         """
-        return get_previous_lockfile(package_build_base, self.reference_name)
+        reference_base_path = getattr(args, self.reference_name + '_base')
+        package_reference_base = os.path.join(reference_base_path, pkg_name)
+        return get_previous_lockfile(
+            package_reference_base, self.reference_name)
 
     def get_job_lockfile(self, job):
         """
@@ -68,7 +78,10 @@ class VerbHandlerExtensionPoint:
         :param jobs: The job from `event[1]`
         :returns: A lockfile, or None
         """
-        return self.get_reference_lockfile(job.task_context.args.build_base)
+        reference_pkg_base_path = getattr(
+            job.task_context.args, self.reference_name + '_base')
+        return get_previous_lockfile(
+            reference_pkg_base_path, self.reference_name)
 
 
 def add_verb_handler_arguments(parser):

@@ -2,8 +2,6 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
-import os
-
 from colcon_cache.verb_handler import get_verb_handler_extensions
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
@@ -76,13 +74,10 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
 
             pkg = decorator.descriptor
 
-            package_build_base = os.path.join(
-                args.build_base, pkg.name)
-
             verb_lockfile = verb_handler_extension\
-                .get_current_lockfile(package_build_base)
+                .get_current_lockfile(args, pkg.name)
             reference_lockfile = verb_handler_extension\
-                .get_reference_lockfile(package_build_base)
+                .get_reference_lockfile(args, pkg.name)
             reference_name = verb_handler_extension.reference_name
 
             package_kind = None
