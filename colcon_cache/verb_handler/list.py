@@ -20,7 +20,7 @@ class ListVerbHandler(VerbHandlerExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         pass
 
-    def get_reference_lockfile(self, package_build_base):  # noqa: D102
+    def get_reference_lockfile(self, args, pkg_name):  # noqa: D102
         return None
 
     def get_job_lockfile(self, job):  # noqa: D102

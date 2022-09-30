@@ -24,7 +24,7 @@ class CacheVerbHandler(VerbHandlerExtensionPoint):
             help='The base path for all cache directories '
                  '(default: {self.base_path})'.format_map(locals()))
 
-    def get_reference_lockfile(self, package_build_base):  # noqa: D102
+    def get_reference_lockfile(self, args, pkg_name):  # noqa: D102
         return None
 
     def get_job_lockfile(self, job):  # noqa: D102
