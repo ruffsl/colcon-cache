@@ -8,9 +8,9 @@ from colcon_cache.cache import get_lockfile_path
 
 def get_previous_lockfile(package_base_path, verb_name):
     """
-    Get the lockfile of a verb from the package build directory.
+    Get the lockfile of a verb from the package base path.
 
-    :param str package_base_path: The build directory of a package
+    :param str package_base_path: The base path of a package
     :param str verb_name: The invoked verb name
     :returns: The previously persisted lockfile, otherwise None
     :rtype: CacheLockfile
