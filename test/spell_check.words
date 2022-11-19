@@ -42,5 +42,6 @@ symlink
 tempfile
 thomas
 todo
+unittest
 unmerged
 wildcard

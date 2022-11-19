@@ -1,9 +1,10 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
+from unittest.mock import Mock
+
 from colcon_cache.verb.cache import CacheVerb
 from colcon_core.command import CommandContext
-from mock import Mock
 
 
 class Object(object):
