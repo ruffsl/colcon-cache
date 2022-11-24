@@ -54,24 +54,24 @@ class DirhashLockTask(TaskExtensionPoint):
             metavar=''
         )
 
-        filter_options = parser.add_argument_group(
-            title='Filtering options',
-            description='Specify what files and directories to include. All '
-            'files and directories (including symbolic links) are included '
-            'by default. The --dirhash-match/--dirhash-ignore arguments '
-            'allows for selection using glob/wildcard (".gitignore style") '
-            'path matching. Paths relative to the root `directory` (i.e. '
-            'excluding the name of the root directory itself) are matched '
-            'against the provided patterns. For example, to only include '
-            'python source files, use: '
-            '`colcon cache lock --dirhash-match "*.py"` '
-            'or to exclude hidden files and directories use: '
-            '`colcon cache lock --dirhash-ignore ".*" ".*/"` '
-            'which is short for '
-            '`colcon cache lock --dirhash-match "*" "!.*" "!.*/"`. '
-            'For further details see '
-            'https://github.com/andhus/dirhash/README.md#filtering'
-        )
+        # filter_options = parser.add_argument_group(
+        #     title='Filtering options',
+        #     description='Specify what files and directories to include. All '
+        #     'files and directories (including symbolic links) are included '
+        #     'by default. The --dirhash-match/--dirhash-ignore arguments '
+        #     'allows for selection using glob/wildcard (".gitignore style") '
+        #     'path matching. Paths relative to the root `directory` (i.e. '
+        #     'excluding the name of the root directory itself) are matched '
+        #     'against the provided patterns. For example, to only include '
+        #     'python source files, use: '
+        #     '`colcon cache lock --dirhash-match "*.py"` '
+        #     'or to exclude hidden files and directories use: '
+        #     '`colcon cache lock --dirhash-ignore ".*" ".*/"` '
+        #     'which is short for '
+        #     '`colcon cache lock --dirhash-match "*" "!.*" "!.*/"`. '
+        #     'For further details see '
+        #     'https://github.com/andhus/dirhash/README.md#filtering'
+        # )
         # FIXME: Find out how colcon help could display group description
         filter_options = parser
 
@@ -115,12 +115,12 @@ class DirhashLockTask(TaskExtensionPoint):
             help='Do not include symbolic links to files.'
         )
 
-        protocol_options = parser.add_argument_group(
-            title='Protocol options',
-            description='Specify what properties of files and directories to '
-            'include and to allow cyclic links. For further details see '
-            'https://github.com/andhus/dirhash/DIRHASH_STANDARD.md#protocol'
-        )
+        # protocol_options = parser.add_argument_group(
+        #     title='Protocol options',
+        #     description='Specify what properties of files and directories to '
+        #     'include and to allow cyclic links. For further details see '
+        #     'https://github.com/andhus/dirhash/DIRHASH_STANDARD.md#protocol'
+        # )
         # FIXME: Find out how colcon help could display group description
         protocol_options = parser
         protocol_options.add_argument(
@@ -144,10 +144,10 @@ class DirhashLockTask(TaskExtensionPoint):
             'path to the target directory).'
         )
 
-        implementation_options = parser.add_argument_group(
-            title='Implementation options',
-            description=''
-        )
+        # implementation_options = parser.add_argument_group(
+        #     title='Implementation options',
+        #     description=''
+        # )
         # FIXME: Find out how colcon help could display group description
         implementation_options = parser
         implementation_options.add_argument(
