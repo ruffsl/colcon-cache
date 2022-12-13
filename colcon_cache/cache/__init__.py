@@ -98,16 +98,16 @@ class CacheLockfile:
                 sort_keys=True)
 
 
-def get_lockfile_path(package_build_base, verb_name):
+def get_lockfile_path(package_base_path, verb_name):
     """
     Get the lockfile path of a verb from the package build directory.
 
-    :param str package_build_base: The build directory of a package
+    :param str package_base_path: The base path of a package
     :param str verb_name: The invoked verb name
     :returns: The path for the lockfile
     :rtype: Path
     """
     return pathlib.Path(
-        package_build_base,
+        package_base_path,
         'cache',
         LOCKFILE_FILENAME.format_map(locals()))

@@ -2,8 +2,6 @@
 # Copyright 2021 Ruffin White
 # Licensed under the Apache License, Version 2.0
 
-import os
-
 from colcon_cache.verb_handler import get_verb_handler_extensions
 from colcon_core.package_selection import logger
 from colcon_core.package_selection import PackageSelectionExtensionPoint
@@ -45,14 +43,6 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
         else:
             assert False
 
-        if not hasattr(args, 'build_base'):
-            logger.warning(
-                "Ignoring '{argument}' since the invoked verb doesn't have a "
-                "'--build-base' argument and therefore can't access "
-                'information about the relative state of a package'
-                .format_map(locals()))
-            return
-
         verb_name = args.packages_select_cache_key
         if not verb_name:
             verb_name = args.verb_name
@@ -76,13 +66,10 @@ class ValidPackageSelection(PackageSelectionExtensionPoint):
 
             pkg = decorator.descriptor
 
-            package_build_base = os.path.join(
-                args.build_base, pkg.name)
-
             verb_lockfile = verb_handler_extension\
-                .get_current_lockfile(package_build_base)
+                .get_current_lockfile(args, pkg.name)
             reference_lockfile = verb_handler_extension\
-                .get_reference_lockfile(package_build_base)
+                .get_reference_lockfile(args, pkg.name)
             reference_name = verb_handler_extension.reference_name
 
             package_kind = None

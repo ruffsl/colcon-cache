@@ -78,9 +78,9 @@ class GitLockTask(TaskExtensionPoint):
             "Capturing git cache of package in '{args.path}'"
             .format_map(locals()))
 
-        cache_base = Path(args.build_base, 'cache')
+        cache_base = Path(args.cache_base, 'cache')
         cache_base.mkdir(parents=True, exist_ok=True)
-        lockfile = get_previous_lockfile(args.build_base, 'cache')
+        lockfile = get_previous_lockfile(args.cache_base, 'cache')
         if lockfile is None:
             lockfile = CacheLockfile(lock_type=ENTRY_TYPE)
         assert lockfile.lock_type == ENTRY_TYPE
@@ -96,7 +96,7 @@ class GitLockTask(TaskExtensionPoint):
         self.compute_current_checksums(args, lockfile)
 
         pkg.metadata['lockfile'] = lockfile
-        set_lockfile(args.build_base, 'cache', lockfile)
+        set_lockfile(args.cache_base, 'cache', lockfile)
 
         return 0
 

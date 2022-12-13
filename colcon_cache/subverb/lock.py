@@ -8,6 +8,7 @@ import os.path
 from pathlib import Path
 
 from colcon_cache.subverb import CacheSubverbExtensionPoint
+from colcon_cache.verb_handler import add_verb_handler_arguments
 from colcon_core.argument_parser.destination_collector \
     import DestinationCollectorDecorator
 from colcon_core.event.job import JobUnselected
@@ -72,16 +73,12 @@ class LockCacheSubverb(CacheSubverbExtensionPoint):
 
     def add_arguments(self, *, parser):  # noqa: D102
         parser.add_argument(
-            '--build-base',
-            default='build',
-            help='The base path for all build directories (default: build)')
-
-        parser.add_argument(
             '--ignore-dependencies',
             action='store_true',
             help='Ignore dependencies when capturing caches (default: false)')
 
         add_executor_arguments(parser)
+        add_verb_handler_arguments(parser)
         add_event_handler_arguments(parser)
         add_packages_arguments(parser)
 

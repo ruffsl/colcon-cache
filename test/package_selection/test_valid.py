@@ -18,11 +18,13 @@ def test_valid():
 
     # TODO: check event log for warning by mocking logger
     args = Object()
+    args.packages_select_cache_key = 'cache'
     args.packages_select_cache_invalid = True
     args.packages_skip_cache_valid = False
     valid_package_selection.select_packages(args, decorators)
 
     args = Object()
+    args.packages_select_cache_key = 'cache'
     args.packages_select_cache_invalid = False
     args.packages_skip_cache_valid = True
     valid_package_selection.select_packages(args, decorators)
