@@ -33,7 +33,7 @@ def test_flake8():
     sys.stdout = sys.stderr
     # implicitly calls report_errors()
     report = style_guide.check_files([
-        str(Path(__file__).parents[1] / 'colcon_clean'),
+        str(Path(__file__).parents[1] / 'colcon_cache'),
     ])
     report_tests = style_guide_tests.check_files([
         str(Path(__file__).parents[1] / 'test'),
