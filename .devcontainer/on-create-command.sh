@@ -9,12 +9,13 @@ set -eo pipefail
 
 git config --global --add safe.directory "*"
 
-CONSTRAINTS_URL=https://raw.githubusercontent.com/colcon/ci/main/constraints.txt
-CONSTRAINTS_FILE=/tmp/constraints.txt
+COLCON_CI_URL=https://github.com/colcon/ci/archive/refs/heads/main.zip
+curl -sSL $COLCON_CI_URL > /tmp/main.zip
+unzip /tmp/main.zip -d /tmp/
+GITHUB_ACTION_PATH=/tmp/ci-main
 
-# Download constraints
-curl -sSLo $CONSTRAINTS_FILE $CONSTRAINTS_URL
-# Remove this package from constraints
-sed -i "/^$(python setup.py --name)@/d" $CONSTRAINTS_FILE
-# Install dependencies, including any 'test' extras, as well as pytest-cov
-pip install -U -e .[test] pytest-cov -c $CONSTRAINTS_FILE
+PKG_NAME=$(pip list -l -e --format json | jq '.[0].name' -r | tr _ -)
+cp -a ${GITHUB_ACTION_PATH}/constraints{,-heads,-pins}.txt ./
+sed -i.orig "s/^${PKG_NAME}@.*//g" constraints-heads.txt
+# Install dependencies, including 'test' extras, as well as pytest-cov
+python -m pip install -U -e .[test] pytest-cov -c constraints.txt
