@@ -9,8 +9,6 @@ set -eo pipefail
 
 git config --global --add safe.directory "*"
 
-apt update && apt install -y jq
-
 COLCON_CI_URL=https://github.com/colcon/ci/archive/refs/heads/main.zip
 curl -sSL $COLCON_CI_URL > /tmp/main.zip
 unzip /tmp/main.zip -d /tmp/
