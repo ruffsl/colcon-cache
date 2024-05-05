@@ -1,7 +1,7 @@
 {
-    "name": "colcon-clean",
+    "name": "colcon-cache",
     "image": "python:3",
-    "workspaceFolder": "/workspace/colcon-clean",
+    "workspaceFolder": "/workspace/colcon-cache",
     "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
     "onCreateCommand": ".devcontainer/on-create-command.sh",
     "postCreateCommand": ".devcontainer/post-create-command.sh",
