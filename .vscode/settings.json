@@ -10,5 +10,16 @@
         "sched",
         "subverb",
         "subverbs"
-    ]
+    ],
+    "python.languageServer": "Default",
+    "python.testing.pytestArgs": [
+        "--cov",
+        "--cov-branch",
+        "--cov-report",
+        "xml:coverage.xml",
+        "--cov-config",
+        "setup.cfg"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
