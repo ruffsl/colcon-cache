@@ -23,6 +23,7 @@ hexdigest
 hexsha
 https
 iterdir
+linter
 lockfile
 lockfiles
 mkdtemp
@@ -30,6 +31,7 @@ nargs
 noqa
 pathlib
 plugin
+pydocstyle
 pytest
 rmtree
 rtype
