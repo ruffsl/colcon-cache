@@ -17,7 +17,7 @@ def get_dependencies_lockfiles(args, dependencies):  # noqa: D103
                 lockfile = _cached_lockfiles[dep_path]
             else:
                 lockfile = get_previous_lockfile(
-                    package_build_base=dep_path,
+                    package_base_path=dep_path,
                     verb_name='cache')
                 _cached_lockfiles[dep_path] = lockfile
             dependencies_checksums[dep_name] = lockfile

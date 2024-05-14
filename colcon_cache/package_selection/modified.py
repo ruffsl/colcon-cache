@@ -76,11 +76,8 @@ class ModifiedPackageSelection(PackageSelectionExtensionPoint):
 
             pkg = decorator.descriptor
 
-            package_build_base = os.path.join(
-                args.build_base, pkg.name)
-
             verb_lockfile = verb_handler_extension\
-                .get_current_lockfile(package_build_base)
+                .get_current_lockfile(args, pkg.name)
 
             package_kind = None
             if verb_lockfile is None:
