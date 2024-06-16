@@ -19,3 +19,6 @@ cp -a ${GITHUB_ACTION_PATH}/constraints{,-heads,-pins}.txt ./
 sed -i.orig "s/^${PKG_NAME}@.*//g" constraints-heads.txt
 # Install dependencies, including 'test' extras, as well as pytest-cov
 python -m pip install -U -e .[test] pytest-cov -c constraints.txt
+
+# cleanup temp files
+rm constraints*.txt*
