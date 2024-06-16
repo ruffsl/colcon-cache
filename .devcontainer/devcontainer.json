@@ -1,0 +1,23 @@
+{
+    "name": "colcon-cache",
+    "image": "python:3",
+    "workspaceFolder": "/workspace/colcon-cache",
+    "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
+    "onCreateCommand": ".devcontainer/on-create-command.sh",
+    "postCreateCommand": ".devcontainer/post-create-command.sh",
+    "features": {
+        "ghcr.io/devcontainers-contrib/features/apt-get-packages:1": {
+            "packages": [
+                "jq",
+            ]
+        },
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {},
+            "extensions": [
+                "ms-python.python"
+            ]
+        }
+    }
+}
